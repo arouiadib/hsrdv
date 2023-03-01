@@ -210,6 +210,8 @@ class ReparationRepository
 
     public function installFixtures()
     {
+
+
         $errors = [];
         $sqlInsertStatuses = "INSERT INTO `{$this->dbPrefix}hsrdv_status` (`id_status`, `code`, `message`, `color`)
                                VALUES (1 , 'DEMANDE_REPARATION', 'Demande de réparation', 'yellow'),
@@ -235,4 +237,6 @@ class ReparationRepository
 
         return $errors;
     }
+
+
 }

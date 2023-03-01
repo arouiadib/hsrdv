@@ -39,10 +39,19 @@ class Hsrdv extends Module implements WidgetInterface
     const LIVRE = 9;
     const ENQUETE = 10;
 
-    /*    const RDV_STATUSES = [
-            1 => '$this->trans('Rendez-vous', array(), 'Modules.Hsrdv.Admin', $lang['locale'])'
-        ];
-    */
+    const STATUSES = [
+        'DEMANDE_REPARATION' => [ 'title' => 'Demande de réparation', 'color' => 'yellow'],
+        'PRISE_RDV' => [ 'title' => 'Prise de rendez-vous', 'color' => 'lime'],
+        'RDV_REFUSE' => [ 'title' => 'Rendez-vous refusé', 'color' => 'tomato'],
+        'RDV_PRIS' => [ 'title' => 'Rendez-vous pris', 'color' => 'yellowgreen'],
+        'REPARATION_EN_COURS' => [ 'title' => 'Réparation en cours', 'color' => 'steelblue'],
+        'NON_PRIS_EN_CHARGE' => [ 'title' => 'Non pris en charge', 'color' => 'red'],
+        'REPARE' => [ 'title' => 'Réparé', 'color' => 'green'],
+        'A_LIVRER' => [ 'title' => 'A Livrer', 'color' => 'grey'],
+        'LIVRE' => [ 'title' => 'Livré', 'color' => 'blue'],
+        'ENQUETE' => [ 'title' => 'Enquête de satisfaction', 'color' => 'purple']
+    ];
+
 
     /* @var ReparationRepository */
     private $reparationRepository;
@@ -93,6 +102,12 @@ class Hsrdv extends Module implements WidgetInterface
         if (!parent::install() || !(bool)$this->registerHook($hooks)) {
             return false;
         }
+
+
+        foreach (\Hsrdv::STATUSES as $status) {
+            $this->addOrderState($status['title'], $status['color']);
+        }
+
 
         if (null !== $this->getReparationRepository()) {
             $installed = $this->installDatabase();
@@ -840,5 +855,38 @@ class Hsrdv extends Module implements WidgetInterface
                 'parameters' => [$reparationId],
             ];
         }
+    }
+
+    public function addOrderState($title, $color)
+    {
+        $state_exist = false;
+        $states = OrderState::getOrderStates((int)$this->context->language->id);
+
+        // check if order state exist
+        foreach ($states as $state) {
+            if (in_array($title, $state)) {
+                $state_exist = true;
+                break;
+            }
+        }
+
+        // If the state does not exist, we create it.
+        if (!$state_exist) {
+            // create new order state
+            $order_state = new OrderState();
+            $order_state->color = $color;
+            $order_state->send_email = false;
+            $order_state->module_name = $this->name;
+/*            $order_state->template = 'name of your email template';*/
+            $order_state->name = array();
+            $languages = Language::getLanguages(false);
+            foreach ($languages as $language)
+                $order_state->name[ $language['id_lang'] ] = $title;
+
+            // Update object
+            $order_state->add();
+        }
+
+        return true;
     }
 }
