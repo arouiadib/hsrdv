@@ -345,9 +345,9 @@ class HsRdvProcessRdvInitialModuleFrontController extends ModuleFrontController 
         }
 
 
-        $history = new OrderHistory();
+/*        $history = new OrderHistory();
         $history->id_order = (int)$order->id;
-        $history->changeIdOrderState(22, (int)($result));
+        $history->changeIdOrderState(22, (int)($result));*/
 // Amount paid by customer is not the right one -> Status = payment error
 // We don't use the following condition to avoid the float precision issues : http://www.php.net/manual/en/language.types.float.php
 // if ($order->total_paid != $order->total_paid_real)
