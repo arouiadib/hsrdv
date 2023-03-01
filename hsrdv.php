@@ -719,6 +719,8 @@ class Hsrdv extends Module implements WidgetInterface
      */
     public function hookDisplayAdminOrderSide(array $params)
     {
+
+
         /** @var OrderSignatureRepository $signatureRepository */
        /* $signatureRepository = $this->get(
             'prestashop.module.demovieworderhooks.repository.order_signature_repository'
@@ -820,9 +822,10 @@ class Hsrdv extends Module implements WidgetInterface
             //var_dump($typesReparation);die;
 
             return $this->render('@Modules/hsrdv/views/templates/admin/reparation/initial_decision_form.html.twig', [
+                'id_order' => $params['id_order'],
                 'presented_reparation' => $presentedReparation,
                 'types_reparation' => $typesReparation,
-                'initial_decision_form_action' => $this->get('router')->generate('admin_rdv_reparation_inital_decision'),
+                'initial_decision_form_action' => $this->get('router')->generate('admin_rdv_reparation_inital_decision_bis'),
                 'prise_en_charge_decision_form_action' => $this->get('router')->generate('admin_rdv_reparation_prise_en_charge_decision'),
                 'etat_reparation_form_action' => $this->get('router')->generate('admin_rdv_reparation_etat_reparation'),
                 'etat_livraison_form_action' => $this->get('router')->generate('admin_rdv_reparation_etat_livraison'),

@@ -26,6 +26,14 @@ admin_rdv_reparation_inital_decision:
         _legacy_controller: 'HsRdvReparationController'
         _legacy_link: 'HsRdvReparationController'
 
+admin_rdv_reparation_inital_decision_bis:
+    path: /rdv_reparation/initial_decision_bis
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\ReparationController::initialDecisionBisAction'
+        _legacy_controller: 'HsRdvReparationController'
+        _legacy_link: 'HsRdvReparationController'
+
 admin_rdv_calendar:
     path: /rdv_reparation/calendar/{year}/{month}
     methods: [GET]

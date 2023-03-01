@@ -415,39 +415,43 @@ class ReparationController extends FrameworkBundleAdminController
             400);
 
     }
+
+
     public function initialDecisionBisAction(Request $request)
     {
-        if (!$request->isXmlHttpRequest()) {
+/*        if (!$request->isXmlHttpRequest()) {
             return new JsonResponse(array(
                 'status' => 'Error',
                 'message' => 'Error'),
                 400);
-        }
+        }*/
 
         if(isset($request->request))
         {
+            $orderId = $request->request->get('id_order');
             $appareils = !is_null($request->request->get('appareils')) ? $request->request->get('appareils') : [];
 
-            if (count($appareils) == 0)
+           /* if (count($appareils) == 0)
             {
+                $this->addFlash('error', $this->getErrorMessageForException($e, $this->getErrorMessages($e)));
                 return new JsonResponse(array(
                     'status' => 'Error',
                     'message' => 'No decision taken'),
                     400);
-            }
+            }*/
 
             $idReparation = (int)$request->request->get('id_reparation');
             $entityManager = $this->container->get('doctrine.orm.entity_manager');
             $appareilRepository = $entityManager->getRepository(Appareil::class);
             $appareilsDb = $appareilRepository->findBy(['id_reparation'=> $idReparation]);
 
-            if (count($appareils) != count($appareilsDb))
+/*            if (count($appareils) != count($appareilsDb))
             {
                 return new JsonResponse(array(
                     'status' => 'Error',
                     'message' => 'Missing appareil decision'),
                     400);
-            }
+            }*/
             // Persist appareils decisions
             foreach ($appareilsDb as $key => $appareilDb) {
                 foreach ($appareils as $k => $appareilDecision) {
@@ -647,11 +651,15 @@ class ReparationController extends FrameworkBundleAdminController
                 'color' => $status->getColor()
             ];
 
-            return new JsonResponse(array(
+
+            return $this->redirectToRoute('admin_orders_view', [
+                'orderId' => $orderId,
+            ]);
+           /* return new JsonResponse(array(
                 'status' => 'OK',
                 'rdv_status' => $rdvStatus,
                 'message' => []),
-                200);
+                200);*/
         }
 
         return new JsonResponse(array(

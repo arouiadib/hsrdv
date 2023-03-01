@@ -299,6 +299,7 @@
 
                                 </div>
                                 <input type="hidden"  name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
+                                <input type="hidden"  name="id_order" value="{{ id_order }}" />
                                 <input type="submit" class="btn btn-primary" name="submitFeedback"
                                        value="{{ 'Enregistrer'|trans({}, 'Modules.Hsrdv.Admin') }}" {#type="submit"#}
                                         {# {% if presented_reparation.status.id_status >= 5 %} disabled {% endif %}#}
