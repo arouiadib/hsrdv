@@ -71,12 +71,23 @@ class Hsrdv extends Module implements WidgetInterface
 
     public function install()
     {
-        if (!parent::install()
-            || !$this->registerHook('moduleRoutes')
-            || !$this->registerHook('actionFrontControllerSetMedia')
-            || !$this->registerHook('actionAdminControllerSetMedia')
-            || !$this->registerHook('displayHeader')
-        ) {
+
+        $hooks = [
+            'displayBackOfficeOrderActions',
+            'displayAdminOrderTabLink',
+            'displayAdminOrderTabContent',
+            'displayAdminOrderMain',
+            'displayAdminOrderSide',
+            'displayAdminOrder',
+            'displayAdminOrderTop',
+            'actionGetAdminOrderButtons',
+            'moduleRoutes',
+            'actionFrontControllerSetMedia',
+            'actionAdminControllerSetMedia',
+            'displayHeader'
+        ];
+
+        if (!parent::install() || !(bool) $this->registerHook($hooks)) {
             return false;
         }
 
