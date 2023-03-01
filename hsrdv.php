@@ -51,7 +51,7 @@ class Hsrdv extends Module implements WidgetInterface
         'LIVRE' => [ 'title' => 'Livré', 'color' => '#0500ce'],
         'ENQUETE' => [ 'title' => 'Enquête de satisfaction', 'color' => '#ff37dc']
     ];
-    
+
     /* @var ReparationRepository */
     private $reparationRepository;
 
@@ -756,19 +756,20 @@ class Hsrdv extends Module implements WidgetInterface
         ]);*/
         $errors = [];
         try {
-            $reparationId = 22;
+            $order = new Order((int)$params['id_order']);
             $presentedReparation = [];
 
             $entityManager = $this->get('doctrine.orm.entity_manager');
             $reparationRepository = $entityManager->getRepository(\PrestaShop\Module\HsRdv\Entity\Reparation::class);
-            $reparation = $reparationRepository->find($reparationId);
+            $reparation = $reparationRepository->findOneBy(['idOrder'=> (int)$params['id_order']]);
 
-            $statusRepository = $entityManager->getRepository(Status::class);
-            $status = $statusRepository->findOneBy(['id'=> $reparation->getIdStatus()]);
+            //$statusRepository = $entityManager->getRepository(Status::class);
+            //$status = $statusRepository->findOneBy(['id'=> $reparation->getIdStatus()]);
 
             $appareilRepository = $entityManager->getRepository(\PrestaShop\Module\HsRdv\Entity\Appareil::class);
             $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId()]);
 
+            //var_dump($appareils);die;
             $customer = new Customer((int)$reparation->getIdClient());
 
             foreach ($appareils as $appareil) {
@@ -781,7 +782,7 @@ class Hsrdv extends Module implements WidgetInterface
                 ];
             }
 
-            $devisRepository = $entityManager->getRepository(Devis::class);
+            /*$devisRepository = $entityManager->getRepository(Devis::class);
             $devis = $devisRepository->findOneBy(['id_reparation'=> $reparation->getId()]);
             $presentedReparation['devis']=[];
             if ($devis) {
@@ -800,22 +801,22 @@ class Hsrdv extends Module implements WidgetInterface
                         'id_appareil' => $ligne->getIdAppareil()
                     ];
                 }
-            }
+            }*/
 
-            $presentedReparation['id_reparation'] = $reparationId;
+            $presentedReparation['id_reparation'] = $reparation->getId();
             $presentedReparation['date_demande'] = $reparation->getDateDemande();
             $presentedReparation['mode_livraison'] = $reparation->getModeLivraison();
             $presentedReparation['date_reparation'] = $reparation->getDateReparation();
             $presentedReparation['date_livraison'] = $reparation->getDateLivraison();
 
-            if(!isset($status)) {
-                $status = new Status();
-            }
+
+            $status = new OrderState((int)$order->current_state);
+
 
             $presentedReparation['status'] = [
-                'id_status' => $status->getId(),
-                'message' => $status->getMessage(),
-                'color' => $status->getColor()
+                'id_status' => $status->id,
+                'message' => $status->name,
+                'color' => $status->color
             ];
 
             $presentedReparation['client'] = [
@@ -851,7 +852,7 @@ class Hsrdv extends Module implements WidgetInterface
             $errors[] = [
                 'key' => 'Could not find #%i',
                 'domain' => 'Admin.Catalog.Notification',
-                'parameters' => [$reparationId],
+                'parameters' => [$reparation->getId()],
             ];
         }
     }

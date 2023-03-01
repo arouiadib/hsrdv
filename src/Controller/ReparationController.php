@@ -428,6 +428,22 @@ class ReparationController extends FrameworkBundleAdminController
 
         if(isset($request->request))
         {
+
+            $state_exist = false;
+            $states = OrderState::getOrderStates((int)$this->getContext()->language->id);
+
+            var_dump($states);die;
+
+
+            // check if order state exist
+            foreach ($states as $state) {
+                if (in_array($title, $state)) {
+                    $state_exist = true;
+                    break;
+                }
+            }
+
+
             $orderId = $request->request->get('id_order');
             $appareils = !is_null($request->request->get('appareils')) ? $request->request->get('appareils') : [];
 

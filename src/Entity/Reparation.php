@@ -72,6 +72,14 @@ class Reparation
     private $token;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(name="id_order", type="integer")
+     */
+    private $idOrder;
+
+
+    /**
      * @return int
      */
     public function getId()
@@ -200,6 +208,21 @@ class Reparation
     }
 
     /**
+     * @return int
+     */
+    public function getIdOrder()
+    {
+        return $this->idOrder;
+    }
+
+    /**
+     * @param int $idOrder
+     */
+    public function setIdOrder($idOrder)
+    {
+        $this->idOrder = $idOrder;
+    }
+    /**
      * @return array
      */
     public function toArray()
@@ -210,7 +233,8 @@ class Reparation
             'id_client' => $this->getIdClient()(),
             'date_demande' => $this->getDateDemande(),
             'date_reparation' => $this->getDateReparation(),
-            'date_livraions' => $this->getDateLivraison()
+            'date_livraions' => $this->getDateLivraison(),
+            'id_order' => $this->getIdStatus(),
         ];
     }
 }

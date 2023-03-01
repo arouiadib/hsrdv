@@ -75,6 +75,7 @@ class ReparationRepository
     			`mode_livraison` int,
     			`date_livraison` datetime,
     	        `token` varchar(70) NOT NULL default '',
+    	        `id_order` int(10) unsigned NOT NULL,
     			PRIMARY KEY (`id_reparation`)
             ) ENGINE=$engine DEFAULT CHARSET=utf8",
             "CREATE TABLE IF NOT EXISTS `{$this->dbPrefix}hsrdv_client`(

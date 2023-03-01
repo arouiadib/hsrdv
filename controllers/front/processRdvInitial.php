@@ -206,45 +206,7 @@ class HsRdvProcessRdvInitialModuleFrontController extends ModuleFrontController 
             }
             $id_customer = $customer->id;
         }
-        // todo: if excisting customer, update newsletter
-        $reparation = new Reparation();
-        $reparation->id_status = $this->module ::DEMANDE_REPARATION;
-        $reparation->id_client = $id_customer;
-        $reparation->token = Tools::passwdGen(12);
 
-        $timeNow = new DateTime();
-        $reparation->date_demande = $timeNow->format('Y-m-d H:i:s');;
-        if(!$reparation->add()) {
-            $this->context->controller->errors[] = $this->trans(
-                'An error occurred while creating reparation record',
-                [],
-                'Modules.Hsrdv.Shop'
-            );
-        }
-
-        $appareilsListString = '';
-
-        $lastAppareilKey = array_key_last($appareils);
-        foreach ($appareils as $key => $appareil) {
-            $persitedAppareil = new Appareil();
-            $persitedAppareil->marque = $appareil['marque'];
-            $persitedAppareil->reference = $appareil['reference'];
-            $persitedAppareil->descriptif_panne = $appareil['descriptif_panne'];
-            $persitedAppareil->id_reparation = $reparation->id;
-            if (!$persitedAppareil->add()) {
-                $this->context->controller->errors[] = $this->trans(
-                    'An error occurred while creating appareil record',
-                    [],
-                    'Modules.Hsrdv.Shop'
-                );
-            }
-
-            $appareilsListString = $appareilsListString .  $appareil['marque'] . ' ' . $appareil['reference'];
-            if ($lastAppareilKey != $key)
-            {
-                $appareilsListString = $appareilsListString . ', ';
-            }
-        }
 
         /************************************************
          * Create Order
@@ -261,15 +223,15 @@ class HsRdvProcessRdvInitialModuleFrontController extends ModuleFrontController 
             }*/
         }
 
-/*        $carrier = null;
-        if (!$this->context->cart->isVirtualCart() && isset($package['id_carrier'])) {
-            $carrier = new Carrier((int)$package['id_carrier'], (int)$this->context->cart->id_lang);
-            $order->id_carrier = (int)$carrier->id;
-            $id_carrier = (int)$carrier->id;
-        } else {
-            $order->id_carrier = 0;
-            $id_carrier = 0;
-        }*/
+        /*        $carrier = null;
+                if (!$this->context->cart->isVirtualCart() && isset($package['id_carrier'])) {
+                    $carrier = new Carrier((int)$package['id_carrier'], (int)$this->context->cart->id_lang);
+                    $order->id_carrier = (int)$carrier->id;
+                    $id_carrier = (int)$carrier->id;
+                } else {
+                    $order->id_carrier = 0;
+                    $id_carrier = 0;
+                }*/
 
         $order->id_carrier = 0;
         $id_carrier = 0;
@@ -292,7 +254,20 @@ class HsRdvProcessRdvInitialModuleFrontController extends ModuleFrontController 
         $order->total_products = 0;
         $order->total_products_wt = 0;
         $order->conversion_rate = $this->context->currency->conversion_rate;
-        $order->current_state = 22;
+
+
+
+        $id_new_order_state = false;
+        $name_new_state = Hsrdv::STATUSES['DEMANDE_REPARATION']['title'];
+        $states = OrderState::getOrderStates((int)$this->context->language->id);
+        foreach ($states as $state) {
+            if (in_array($name_new_state, $state)) {
+                $id_new_order_state = $state['id_order_state'];
+                break;
+            }
+        }
+        $order->current_state = (int)$id_new_order_state;
+
         /*if (isset($this->name)) {
             $order->module = $this->name;
         }*/
@@ -345,9 +320,9 @@ class HsRdvProcessRdvInitialModuleFrontController extends ModuleFrontController 
         }
 
 
-/*        $history = new OrderHistory();
-        $history->id_order = (int)$order->id;
-        $history->changeIdOrderState(22, (int)($result));*/
+        /*        $history = new OrderHistory();
+                $history->id_order = (int)$order->id;
+                $history->changeIdOrderState(22, (int)($result));*/
 // Amount paid by customer is not the right one -> Status = payment error
 // We don't use the following condition to avoid the float precision issues : http://www.php.net/manual/en/language.types.float.php
 // if ($order->total_paid != $order->total_paid_real)
@@ -363,28 +338,81 @@ class HsRdvProcessRdvInitialModuleFrontController extends ModuleFrontController 
         }*/
 
 // Insert new Order detail list using cart for the current order
-       /* $order_detail = new OrderDetail(null, null, $this->context);
-        $order_detail->createList($order, $this->context->cart, $id_order_state, $order->product_list, 0, true, $package_list[$id_address][$id_package]['id_warehouse']);
-        $order_detail_list[] = $order_detail;
+        /* $order_detail = new OrderDetail(null, null, $this->context);
+         $order_detail->createList($order, $this->context->cart, $id_order_state, $order->product_list, 0, true, $package_list[$id_address][$id_package]['id_warehouse']);
+         $order_detail_list[] = $order_detail;
 
-        if (self::DEBUG_MODE) {
-            PrestaShopLogger::addLog('PaymentModule::validateOrder - OrderCarrier is about to be added', 1, null, 'Cart', (int)$id_cart, true);
-        }*/
+         if (self::DEBUG_MODE) {
+             PrestaShopLogger::addLog('PaymentModule::validateOrder - OrderCarrier is about to be added', 1, null, 'Cart', (int)$id_cart, true);
+         }*/
 
 // Adding an entry in order_carrier table
-      /*  if (!is_null($carrier)) {
-            $order_carrier = new OrderCarrier();
-            $order_carrier->id_order = (int)$order->id;
-            $order_carrier->id_carrier = (int)$id_carrier;
-            $order_carrier->weight = (float)$order->getTotalWeight();
-            $order_carrier->shipping_cost_tax_excl = (float)$order->total_shipping_tax_excl;
-            $order_carrier->shipping_cost_tax_incl = (float)$order->total_shipping_tax_incl;
-            $order_carrier->add();
-        }*/
+        /*  if (!is_null($carrier)) {
+              $order_carrier = new OrderCarrier();
+              $order_carrier->id_order = (int)$order->id;
+              $order_carrier->id_carrier = (int)$id_carrier;
+              $order_carrier->weight = (float)$order->getTotalWeight();
+              $order_carrier->shipping_cost_tax_excl = (float)$order->total_shipping_tax_excl;
+              $order_carrier->shipping_cost_tax_incl = (float)$order->total_shipping_tax_incl;
+              $order_carrier->add();
+          }*/
         /************************************************
          * Create Order
          *
          */
+
+
+
+
+
+
+
+
+
+
+        // todo: if excisting customer, update newsletter
+        $reparation = new Reparation();
+
+        $reparation->id_order = $order->id;
+        $reparation->id_status = $this->module ::DEMANDE_REPARATION;
+        $reparation->id_client = $id_customer;
+        $reparation->token = Tools::passwdGen(12);
+
+        $timeNow = new DateTime();
+        $reparation->date_demande = $timeNow->format('Y-m-d H:i:s');;
+        if(!$reparation->add()) {
+            $this->context->controller->errors[] = $this->trans(
+                'An error occurred while creating reparation record',
+                [],
+                'Modules.Hsrdv.Shop'
+            );
+        }
+
+        $appareilsListString = '';
+
+        $lastAppareilKey = array_key_last($appareils);
+        foreach ($appareils as $key => $appareil) {
+            $persitedAppareil = new Appareil();
+            $persitedAppareil->marque = $appareil['marque'];
+            $persitedAppareil->reference = $appareil['reference'];
+            $persitedAppareil->descriptif_panne = $appareil['descriptif_panne'];
+            $persitedAppareil->id_reparation = $reparation->id;
+            if (!$persitedAppareil->add()) {
+                $this->context->controller->errors[] = $this->trans(
+                    'An error occurred while creating appareil record',
+                    [],
+                    'Modules.Hsrdv.Shop'
+                );
+            }
+
+            $appareilsListString = $appareilsListString .  $appareil['marque'] . ' ' . $appareil['reference'];
+            if ($lastAppareilKey != $key)
+            {
+                $appareilsListString = $appareilsListString . ', ';
+            }
+        }
+
+
         return $appareilsListString;
     }
 

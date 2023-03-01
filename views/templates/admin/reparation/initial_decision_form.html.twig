@@ -8,26 +8,6 @@
         <div class="row">
             <div class="col">
                 <div class="card">
-                    <h3 class="card-header">
-                        {{ 'Informations sur la reparation:'|trans({}, 'Modules.Hsrdv.Admin') }}
-                    </h3>
-                    <div class="card-body">
-                        <div class="date-demande">
-                            <span class="line-title">{{ 'Date Demande'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                            <span class="line-content">{{ presented_reparation.date_demande|date("m/d/Y H:i:s") }}</span>
-                        </div>
-                        <div class="status-reparation">
-                            <span class="line-title">{{ 'Status Réparation'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                            <span class="line-content" style="background-color: {{ presented_reparation.status.color }};">{{ presented_reparation.status.message }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col">
-                <div class="card">
                   <h3 class="card-header">
                       {{ 'Informations sur le client:'|trans({}, 'Modules.Hsrdv.Admin') }}
                   </h3>
@@ -139,7 +119,7 @@
         </div>
 
         {% if presented_reparation.status.id_status >= 4  %}
-        <div class="row">
+{#        <div class="row">
             <div class="col">
                 <div class="card">
                     <h3 class="card-header">
@@ -205,7 +185,7 @@
                                             {% if presented_reparation.devis.devis_lignes is defined %}
                                             {% for ligne in presented_reparation.devis.devis_lignes %}
                                                 {% set firstLoopIndex = loop.index - 1 %}
-{#                                                {{ dump(firstLoopIndex) }}#}
+#}{#                                                {{ dump(firstLoopIndex) }}#}{#
                                                 <tr class="form-group-line devis-line" id="form-element-{{ firstLoopIndex }}">
                                                     <td>{{ loop.index }}</td>
                                                     <td>
@@ -229,7 +209,7 @@
                                                                 {% if type_reparation.id == ligne.id_type_reparation %}selected{% endif %}
                                                                 >{{ type_reparation.name }}</option>
                                                             {% endfor %}
-                                                            {# todo: selected #}
+                                                            #}{# todo: selected #}{#
                                                         </select>
                                                     </td>
                                                     <td>
@@ -283,7 +263,7 @@
                                         </table>
                                     </div>
                                     <div id="addLineDevis">
-                                        <input class="{#btn btn-primary#}"
+                                        <input class="#}{#btn btn-primary#}{#"
                                                name="addSubForm"
                                                data-button-action="addLine"
                                                value="{{ 'Ajouter ligne'|trans({}, 'Modules.Hsrdv.Admin') }}"
@@ -301,8 +281,8 @@
                                 <input type="hidden"  name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
                                 <input type="hidden"  name="id_order" value="{{ id_order }}" />
                                 <input type="submit" class="btn btn-primary" name="submitFeedback"
-                                       value="{{ 'Enregistrer'|trans({}, 'Modules.Hsrdv.Admin') }}" {#type="submit"#}
-                                        {# {% if presented_reparation.status.id_status >= 5 %} disabled {% endif %}#}
+                                       value="{{ 'Enregistrer'|trans({}, 'Modules.Hsrdv.Admin') }}" #}{#type="submit"#}{#
+                                        #}{# {% if presented_reparation.status.id_status >= 5 %} disabled {% endif %}#}{#
                                 >
                             </form>
                         </div>
@@ -317,12 +297,12 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>#}
         {% endif %}
 
 
         {% if presented_reparation.status.id_status >= 5 and presented_reparation.status.id_status != 6  %}
-            <div class="row">
+{#            <div class="row">
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
@@ -343,14 +323,14 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>#}
         {% endif %}
 
 
 
 
         {% if presented_reparation.status.id_status >= 8  %}
-            <div class="row">
+{#            <div class="row">
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
@@ -362,9 +342,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>#}
 
-            <div class="row">
+{#            <div class="row">
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
@@ -384,7 +364,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>#}
         {% endif %}
 
     </div>

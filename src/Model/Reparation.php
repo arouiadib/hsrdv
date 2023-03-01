@@ -50,6 +50,11 @@ class Reparation extends \ObjectModel
     public $token;
 
     /**
+     * @var int
+     */
+    public $id_order;
+
+    /**
      * @see ObjectModel::$definition
      */
     public static $definition = array(
@@ -64,7 +69,8 @@ class Reparation extends \ObjectModel
             'date_reparation' => array('type' => self::TYPE_DATE),
             'mode_livraison' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt'),
             'date_livraison' => array('type' => self::TYPE_DATE),
-            'token' => array('type' => self::TYPE_STRING)
+            'token' => array('type' => self::TYPE_STRING),
+            'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt'),
         ),
     );
 
@@ -119,6 +125,12 @@ class Reparation extends \ObjectModel
         return Db::getInstance()->getRow($sql);
     }
 
+    public static function getReparationFromIdOrder($id_order)
+    {
+        $sql = 'SELECT r.*  FROM ' . _DB_PREFIX_ . 'hsrdv_reparation r WHERE r.id_order = "'.$id_order. '"';
+
+        return Db::getInstance()->getRow($sql);
+    }
     public static function getReparationsForEnqueteSatisfaction($interval = 10)
     {
         $sql = 'SELECT r.id_reparation, c.`id_customer`, r.`token`  
