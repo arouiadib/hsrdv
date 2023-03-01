@@ -1,0 +1,178 @@
+<div id="timeslots-modal"
+     class="modal repair fade"
+     tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+            </div>
+            <div class="modal-body"
+                 data-action-toggle-day="{{ toggle_day_url }}"
+                 data-day="{{ day }}"
+                 data-month="{{ month }}"
+                 data-year="{{ year }}"
+            >
+                    <div class="day-toggle-buttons"  >
+                        <h2 class="modal-title h6 text-sm-center" id="myModalLabel">{{ date }}</h2>
+                        {% if available %}
+                        <button class="toggle-day activate toggle-source-timeslots"
+                                {% if not activate_morning and not activate_afternoon %}disabled="disabled"{% endif %}
+                        >
+                            <i class="material-icons action-enabled" style="color:green">check</i>
+                            <label>
+                                {{ 'Permettre Toute la journée'|trans({}, 'Modules.Hsrdv.Admin') }}
+                            </label>
+                        </button>
+                        <button class="toggle-day toggle-source-timeslots"
+                                {% if not activate_morning and not activate_afternoon %}disabled="disabled"{% endif %}
+                        >
+                            <i class="material-icons action-disabled" style="color:red">clear</i>
+                            <label>
+                                {{ 'Restreindre Toute la journée'|trans({}, 'Modules.Hsrdv.Admin') }}
+                            </label>
+                        </button>
+                        {% endif %}
+                    </div>
+                <section class="timeslots-container row"
+                         data-action-toggle-half-day="{{ toggle_half_day_url }}">
+                    <div class="col-md-6 morning-timeslots">
+                        <label class="">{{ 'Morning'|trans({}, 'Modules.Hsrdv.Admin') }}</label>
+                        {% if available %}
+                            <div class="half-day-toggle-buttons">
+                                <button class="toggle-half-day toggle-morning activate toggle-source-timeslots"
+                                        {% if not activate_morning %}disabled="disabled"{% endif %}
+                                >
+                                    <i class="material-icons" style="color:green">check</i>
+                                    <label>
+                                        {{ 'Permettre Toute la matinéé'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                    </label>
+                                </button>
+                                <button class="toggle-half-day toggle-morning toggle-source-timeslots"
+                                        {% if not activate_morning %}disabled="disabled"{% endif %}
+                                >
+                                    <i class="material-icons" style="color:red">clear</i>
+                                    <label>
+                                        {{ 'Restreindre Toute la matinée'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                    </label>
+                                </button>
+                            </div>
+                        {% endif %}
+                        <div class="timeslots">
+                            {% for timeslot in timeslots.morning  %}
+                                <div {#{*class="col-md-6"*}#}>
+                                    <div class="form-group">
+                                        <form data-action-timeslot-exception="{{ toggle_timeslot_exception }}">
+                                            <input type="hidden"
+                                                   id="contactChoice1{{ timeslot.timeslot_string }}"
+                                                   name="timeslotString"
+                                                   value="{{ timeslot.timeslot_string }}"
+                                            >
+                                            <input type="hidden"
+                                                   id="contactChoice1{{ timeslot.time_string }}"
+                                                   name="time_bookikng"
+                                                   value="{{ timeslot.time_string }}"
+                                            >
+                                            <button class="toggle-timeslot-exception {% if timeslot.exceptionned %}activate{% endif %}"
+                                                    {% if timeslot.booked or not available %}disabled="disabled"{% endif %}
+                                                >
+                                                {% if not timeslot.booked and available%}
+                                                    {% if timeslot.exceptionned %}
+                                                        <i class="material-icons" style="color:green">check</i>
+                                                    {% else %}
+                                                        <i class="material-icons" style="color:red">clear</i>
+                                                    {% endif %}
+
+                                                    <label>{% if timeslot.exceptionned %}
+                                                            {{ 'Permettre'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                                        {%  else %}
+                                                            {{ 'Restreindre'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                                        {% endif %}
+                                                    </label>
+                                                {% endif %}
+                                                <label>{{ timeslot.timeslot_string }}</label>
+                                            </button>
+                                            {% if timeslot.booked %}
+                                                {{ timeslot.appareils }}
+                                            {% endif %}
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-md-6  afternoon-timeslots">
+                        <label class="">{{ 'Aprés midi'|trans({}, 'Modules.Hsrdv.Admin') }}</label>
+                        {% if available %}
+                            <div class="half-day-toggle-buttons">
+                                <button class="toggle-half-day toggle-afternoon activate toggle-source-timeslots"
+                                        {% if not activate_afternoon %}disabled="disabled"{% endif %}
+                                >
+                                    <i class="material-icons action-enabled" style="color:green">check</i>
+                                    <label>
+                                        {{ 'Permettre tout l\apres midi'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                    </label>
+                                </button>
+                                <button class="toggle-half-day toggle-afternoon toggle-source-timeslots"
+                                        {% if not activate_afternoon %}disabled="disabled"{% endif %}
+                                >
+                                    <i class="material-icons action-disabled" style="color:red">clear</i>
+                                    <label>
+                                        {{ 'Restreindre tout l\apres midi'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                    </label>
+                                </button>
+                            </div>
+                        {% endif %}
+                        <div class="timeslots">
+                            {% for timeslot in timeslots.afternoon  %}
+                                <div {#class="col-md-6"#}>
+                                    <div class="form-group">
+                                        <form data-action-timeslot-exception="{{ toggle_timeslot_exception }}">
+                                            <input type="hidden"
+                                                   id="contactChoice1{{ timeslot.timeslot_string }}"
+                                                   name="timeslotString"
+                                                   value="{{ timeslot.timeslot_string }}"
+                                            >
+                                            <input type="hidden"
+                                                   id="contactChoice1{{ timeslot.time_string }}"
+                                                   name="time_booking"
+                                                   value="{{ timeslot.time_string }}"
+                                            >
+                                            <button class="toggle-timeslot-exception {% if timeslot.exceptionned %}activate{% endif %}"
+                                                    {% if timeslot.booked or not available %}disabled="disabled"{% endif %}
+                                                >
+                                                {% if not timeslot.booked and available %}
+                                                    {% if timeslot.exceptionned %}
+                                                        <i class="material-icons" style="color:green">check</i>
+                                                    {% else %}
+                                                        <i class="material-icons" style="color:red">clear</i>
+                                                    {% endif %}
+
+                                                    <label>{% if timeslot.exceptionned %}
+                                                            {{ 'Permettre'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                                        {%  else %}
+                                                            {{ 'Restreindre'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                                        {% endif %}
+                                                    </label>
+                                                {% endif %}
+                                                <label>{{ timeslot.timeslot_string }}</label>
+                                            </button>
+                                            {% if timeslot.booked %}
+                                                {{ timeslot.appareils }}
+                                            {% endif %}
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>asblog</name>
+    <displayName><![CDATA[Blog for Prestashop 1.7]]></displayName>
+    <version><![CDATA[1.0.0]]></version>
+    <description><![CDATA[Simple and Straightforward module for a blog inside Prestashop 1.7 e-commerce. ]]></description>
+    <author><![CDATA[Adib Aroui]]></author>
+    <tab><![CDATA[content_management]]></tab>
+	<confirmUninstall><![CDATA[]]></confirmUninstall>
+    <is_configurable>1</is_configurable>
+    <need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>

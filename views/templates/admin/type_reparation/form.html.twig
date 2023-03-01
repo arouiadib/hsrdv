@@ -1,0 +1,47 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+{% trans_default_domain "Admin.Design.Feature" %}
+{% form_theme typeReparationForm '@Modules/hsrdv/views/templates/admin/fields.html.twig' %}
+
+{% block content %}
+    {% if typeReparationForm.vars.data.type_reparation.id_type_reparation is defined and typeReparationForm.vars.data.type_reparation.id_type_reparation is not null %}
+        {% set formAction = url('admin_type_reparation_edit_process', {'typeReparationId': typeReparationForm.vars.data.type_reparation.id_type_reparation}) %}
+    {% else %}
+        {% set formAction = url('admin_type_reparation_create_process') %}
+    {% endif %}
+    {{ form_start(typeReparationForm, {'action': formAction, 'attr': {'class': 'form', 'id': 'link_block_form'}}) }}
+    <div class="row justify-content-center">
+        {% block link_block_form %}
+            <div class="col-xl-10">
+                <div class="card">
+                    <h3 class="card-header">
+                        <i class="material-icons">mode_edit</i>
+                        {% if typeReparationForm.vars.data.type_reparation.id_type_reparation is defined %}
+                            {{ 'Editer Type de réparation'|trans({}, 'Modules.Hsrdv.Admin') }}
+                        {% else %}
+                            {{ 'Nouveau Type de réparation'|trans({}, 'Modules.Hsrdv.Admin') }}
+                        {% endif %}
+                    </h3>
+                    <div class="card-block row">
+                        <div class="card-text">
+                            {{ form_row(typeReparationForm.type_reparation.name) }}
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url('admin_type_reparation_list') }}" class="btn btn-secondary">{{ 'Cancel'|trans({}, 'Admin.Actions') }}</a>
+                            <button class="btn btn-primary">{{ 'Save'|trans({}, 'Admin.Actions') }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
+    </div>
+    {{ form_end(typeReparationForm) }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script src="{{ asset('../modules/hsrdv/views/public/form.bundle.js') }}"></script>
+{% endblock %}

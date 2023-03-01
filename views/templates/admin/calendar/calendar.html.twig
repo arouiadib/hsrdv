@@ -1,0 +1,159 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+{% trans_default_domain "Admin.Design.Feature" %}
+
+{% block content %}
+    <section class="calendar container">
+            <div class="cart-content" id="">
+                <table class='table table-bordered'
+                       data-month="{{ data_month }}"
+                       data-year="{{ year }}"
+                       data-action-timeslots="{{ timeslots_url }}"
+                       data-action-toggle-half-day="{{ toggle_half_day_url }}"
+                       data-action-toggle-day="{{ toggle_day_url }}"
+                       {#data-reparation-token="{$reparationToken}"#}
+                >
+                    <center>
+                        <h2>{{ month_name }} - 20{{ year }}</h2>
+                        <a class='btn btn-xs btn-primary'
+                           href="{{ previous_month_link }}">
+                            {{ 'Previous Month'|trans({}, 'Modules.Hsrdv.Admin') }}
+                        </a>
+                        <a href="{{ current_month_link }}"
+                           class='btn btn-xs btn-primary'
+                           data-month={{ data_month }}>
+                            {{ 'Current Month'|trans({}, 'Modules.Hsrdv.Admin') }}
+                        </a>
+                        <a href="{{ next_month_link }}"
+                           class="btn btn-xs btn-primary">
+                            {{ 'Next Month'|trans({}, 'Modules.Hsrdv.Admin') }}
+                        </a>
+                    </center>
+
+                    {% set currentDay = 1 %}
+
+                    <tr>
+                        {% for day in days_of_week %}
+                            <th  class='header'>{{ day }}</th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        {% if day_of_week != 0 %}
+                            {% for k in 0..(day_of_week -1)%}
+                                <td class="empty"></td>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% for currentDay in 1..number_days %}
+                            {% if day_of_week == 7 %}
+                                {% set day_of_week = 0 %}
+                                    </tr><tr>
+                            {% endif %}
+
+                                {% if day_of_week != 0 and   day_of_week != 6 %}
+                                {% set currentDate = year ~ '-' ~ data_month ~ '-' ~ currentDay %}
+                                <td class="day-td
+                                    {% if (date(currentDate) < date(today_date)) %}day-unavailable{% else %}
+                                        day-available
+                                    {% endif %}"
+                                    data-day="{{ currentDay }}">
+                                            <div class="day-ndetails">
+                                                <div class="half-td half-td-morning
+                                                    {% if bookings[currentDay]['morning']['count_booked'] == morning_number_slots
+                                                        or date(currentDate) < date(today_date) %}
+                                                    half-day-unavailable
+                                                    {% else %}
+                                                    half-day-available
+                                                    {% endif %}"
+                                                >
+                                                    <div class="day-number"><h6>{{ currentDay }}</h6></div>
+                                                    <div class="clearfix"></div>
+                                                    {% if  date(currentDate) >= date(today_date) %}
+{#                                                        <div>
+                                                            {{ 'Exclus'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ bookings[currentDay]['morning']['count_exceptionned'] }}
+                                                        </div>#}
+                                                        <div>
+                                                            {{ 'Réservé'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ bookings[currentDay]['morning']['count_booked'] }}/{{ morning_number_slots }}
+                                                        </div>
+{#                                                        <div>
+                                                            {{ 'Libre'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ bookings[currentDay]['morning']['count_free'] }}
+                                                        </div>#}
+                                                        <div class="half-day-toggle-button">
+                                                            <button class="toggle-half-day toggle-morning toggle-source-calendar activate"
+                                                                    {% if bookings[currentDay]['morning']['count_booked'] == morning_number_slots %}disabled="disabled"{% endif %}
+                                                                >
+                                                                <i class="material-icons" style="color:green">check</i>
+                                                                {{ 'Matinée'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                                            </button>
+                                                            <button class="toggle-half-day toggle-morning toggle-source-calendar"
+                                                                    {% if bookings[currentDay]['morning']['count_booked'] == morning_number_slots %}disabled="disabled"{% endif %}
+                                                            >
+                                                                <i class="material-icons" style="color:red">clear</i>
+                                                                {{ 'Matinée'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                                            </button>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="half-td half-td-afternoon
+                                                       {% if bookings[currentDay]['afternoon']['count_booked'] == afternoon_number_slots
+                                                          or date(currentDate) < date(today_date) %}
+                                                        half-day-unavailable
+                                                        {% else %}
+                                                        half-day-available
+                                                        {% endif %}"
+                                                        >
+                                                    {% if  date(currentDate) >= date(today_date) %}
+                                                        <div class="day-number" style="visibility: hidden;"><h6>{{ currentDay }}</h6></div>
+                                                        <div class="clearfix"></div>
+{#                                                        <div>
+                                                            {{ 'Exclus'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ bookings[currentDay]['afternoon']['count_exceptionned'] }}
+                                                        </div>#}
+                                                        <div>
+                                                            {{ 'Réservé'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ bookings[currentDay]['afternoon']['count_booked'] }}/{{ afternoon_number_slots }}
+                                                        </div>
+{#                                                        <div>
+                                                            {{ 'Libre'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ bookings[currentDay]['afternoon']['count_free'] /a
+                                                        </div>#}
+                                                        <div class="half-day-toggle-button">
+                                                            <button class="toggle-half-day toggle-afternoon toggle-source-calendar activate"
+                                                                    {% if bookings[currentDay]['afternoon']['count_booked'] == afternoon_number_slots %}disabled="disabled"{% endif %}
+                                                            >
+                                                                <i class="material-icons" style="color:green">check</i>
+                                                                {{ 'Aprés midi'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                                            </button>
+                                                            <button class="toggle-half-day toggle-afternoon toggle-source-calendar"
+                                                                    {% if bookings[currentDay]['afternoon']['count_booked'] == afternoon_number_slots %}disabled="disabled"{% endif %}
+                                                            >
+                                                                <i class="material-icons" style="color:red">clear</i>
+                                                                {{ 'Aprés midi'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                                            </button>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="day-book-button">
+                                                <button class="show-timeslots slot-available"> {{ 'Détails'|trans({}, 'Modules.Hsrdv.Admin') }}</button>
+                                            </div>
+
+                                </td>
+                            {% else %}
+                                <td class="day-td day-unavailable">
+                                    <div class="day-number"><h6>{{ currentDay }}</h6></div>
+                                    <div class="clearfix"></div>
+                                </td>
+                            {% endif %}
+
+                            {% set day_of_week = day_of_week + 1 %}
+                            {% set currentDay = currentDay + 1 %}
+                        {% endfor %}
+                    </tr>
+                </table>
+            </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script src="{{ asset('../modules/hsrdv/views/public/BOCalendar.js') }}"></script>
+{% endblock %}

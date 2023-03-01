@@ -1,0 +1,111 @@
+services:
+    _defaults:
+        public: true
+
+    # Reparation Grid data query builder
+    prestashop.module.hsrdv.grid.query_builder:
+        class: PrestaShop\Module\HsRdv\Core\Grid\Query\ReparationQueryBuilder
+        arguments:
+            $connection: '@doctrine.dbal.default_connection'
+            $dbPrefix: '%database_prefix%'
+
+    # Grid Data Factory
+    prestashop.module.hsrdv.grid.data_factory:
+        class: '%prestashop.core.grid.data.factory.doctrine_grid_data_factory%'
+        arguments:
+            $gridQueryBuilder: '@prestashop.module.hsrdv.grid.query_builder'
+            $hookDispatcher: '@prestashop.core.hook.dispatcher'
+            $queryParser: '@prestashop.core.grid.query.doctrine_query_parser'
+            $gridId: 'reparation'
+
+    # Grid Factory
+    prestashop.module.hsrdv.grid.factory:
+        class: PrestaShop\Module\HsRdv\Core\Grid\ReparationGridFactory
+        arguments:
+            $translator: '@translator'
+            $hookDispatcher: '@prestashop.core.hook.dispatcher'
+            $dataFactory: '@prestashop.module.hsrdv.grid.data_factory_decorator'
+            $filterFormFactory: '@prestashop.core.grid.filter.form_factory'
+            $shopContext: '@prestashop.adapter.shop.context'
+
+    prestashop.module.hsrdv.grid.data_factory_decorator:
+        class: PrestaShop\Module\HsRdv\Core\Data\Factory\ReparationGridDataFactory
+        arguments:
+            $idLang: '@=service("prestashop.adapter.legacy.context").getLanguage().id'
+            $reparationDataFactory: '@prestashop.module.hsrdv.grid.data_factory'
+            $router: '@router'
+
+
+
+    ##############################################
+    # Type réparation
+    ##############################################
+    prestashop.module.hsrdv.cache:
+        class: PrestaShop\Module\HsRdv\Cache\LegacyLinkBlockCache
+        arguments:
+            $moduleRepository: '@prestashop.core.admin.module.repository'
+
+    prestashop.module.hsrdv.type_reparation.form_handler:
+        class: PrestaShop\PrestaShop\Core\Form\FormHandler
+        arguments:
+            $formBuilder: '@=service("form.factory").createBuilder()'
+            $hookDispatcher: '@prestashop.core.hook.dispatcher'
+            $formDataProvider: '@prestashop.module.hsrdv.type_reparation.form_provider'
+            $formTypes:
+                'type_reparation': 'PrestaShop\Module\HsRdv\Form\Type\TypeReparationType'
+            $hookName: 'AdminLinkWidget'
+
+    prestashop.module.hsrdv.type_reparation.repository:
+        class: PrestaShop\Module\HsRdv\Repository\TypeReparationRepository
+        arguments:
+            $connection: '@doctrine.dbal.default_connection'
+            $dbPrefix: '%database_prefix%'
+            $languages: '@=service("prestashop.adapter.legacy.context").getLanguages(true, service("prestashop.adapter.shop.context").getContextShopID())'
+            $translator: '@translator'
+
+    prestashop.module.hsrdv.type_reparation.form_type:
+        class: PrestaShop\Module\HsRdv\Form\Type\TypeReparationType
+        parent: 'form.type.translatable.aware'
+        public: true
+        arguments:
+        tags:
+            - { name: form.type }
+
+    # Grid data query builder
+    prestashop.module.hsrdv.type_reparation.grid.query_builder:
+        class: PrestaShop\Module\HsRdv\Core\Grid\Query\TypeReparationQueryBuilder
+        arguments:
+            $connection: '@doctrine.dbal.default_connection'
+            $dbPrefix: '%database_prefix%'
+
+    # Grid Data Factory
+    prestashop.module.hsrdv.type_reparation.grid.data_factory:
+        class: '%prestashop.core.grid.data.factory.doctrine_grid_data_factory%'
+        arguments:
+            $gridQueryBuilder: '@prestashop.module.hsrdv.type_reparation.grid.query_builder'
+            $hookDispatcher: '@prestashop.core.hook.dispatcher'
+            $queryParser: '@prestashop.core.grid.query.doctrine_query_parser'
+            $gridId: 'type_reparation'
+
+    # Grid Factory
+    prestashop.module.hsrdv.type_reparation.grid.factory:
+        class: PrestaShop\Module\HsRdv\Core\Grid\TypeReparationGridFactory
+        arguments:
+            $translator: '@translator'
+            $hookDispatcher: '@prestashop.core.hook.dispatcher'
+            $dataFactory: '@prestashop.module.hsrdv.type_reparation.grid.data_factory'
+            $filterFormFactory: '@prestashop.core.grid.filter.form_factory'
+            $shopContext: '@prestashop.adapter.shop.context'
+
+
+    # Form data provider
+    prestashop.module.hsrdv.type_reparation.form_provider:
+        class: PrestaShop\Module\HsRdv\Form\TypeReparationFormDataProvider
+        arguments:
+            $repository: '@prestashop.module.hsrdv.type_reparation.repository'
+            $cache: '@prestashop.module.hsrdv.cache'
+            $moduleRepository: '@prestashop.core.admin.module.repository'
+            $languages: '@=service("prestashop.adapter.legacy.context").getLanguages(true, service("prestashop.adapter.shop.context").getContextShopID())'
+            $shopId: '@=service("prestashop.adapter.shop.context").getContextShopID()'
+
+

@@ -1,0 +1,25 @@
+{% block form_row -%}
+    {% spaceless %}
+        <div class="{{ block('form_row_class') }} {% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+            {% if form.vars.label is not same as(false) %}
+                {{ form_label(form) }}
+                {% set formGroupClasses = block('form_group_class') %}
+            {% else %}
+                {% set formGroupClasses = block('unlabeled_form_group_class') %}
+            {% endif %}
+            <div class="{{ formGroupClasses }}">
+                {{ form_widget(form) }}
+                {{ form_errors(form) }}
+            </div>
+        </div>
+    {% endspaceless %}
+{%- endblock form_row %}
+
+{% block form_row_class -%}
+    form-group row
+{%- endblock form_row_class %}
+
+{% block unlabeled_form_group_class -%}
+    col-sm-12
+{%- endblock unlabeled_form_group_class %}
+

@@ -1,0 +1,30 @@
+{
+  "name": "prestashop/hsrdv",
+  "description": "Module de prise de rendez vous sous PrestaShop 1.7 pour HiFi Store Paris",
+  "homepage": "https://github.com/arouiadib/hsrdv",
+  "license": "AFL-3.0",
+  "authors": [
+    {
+      "name": "Adib Aroui",
+      "email": "aroui.adib@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.6.0"
+  },
+    "require-dev": {
+    "prestashop/php-dev-tools": "^3.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "PrestaShop\\Module\\HsRdv\\": "src/"
+    },
+    "classmap": ["hsrdv.php"],
+    "exclude-from-classmap": []
+  },
+  "config": {
+    "preferred-install": "dist",
+    "prepend-autoloader": false
+  },
+  "type": "prestashop-module"
+}

@@ -1,0 +1,138 @@
+
+# Admin reparation routes
+admin_rdv_reparation_list:
+    path: /rdv_reparation/list
+    methods: [GET]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\ReparationController::listAction'
+        _legacy_controller: 'HsRdvReparationController'
+        _legacy_link: 'HsRdvReparationController'
+
+admin_rdv_reparation_show:
+    path: /rdv_reparation/show/{reparationId}
+    methods: [GET]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\ReparationController::showAction'
+        _legacy_controller: 'HsRdvReparationController'
+        _legacy_link: 'HsRdvReparationController'
+    requirements:
+        reparationId: \d+
+
+admin_rdv_reparation_inital_decision:
+    path: /rdv_reparation/initial_decision
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\ReparationController::initialDecisionAction'
+        _legacy_controller: 'HsRdvReparationController'
+        _legacy_link: 'HsRdvReparationController'
+
+admin_rdv_calendar:
+    path: /rdv_reparation/calendar/{year}/{month}
+    methods: [GET]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\CalendarController::calendarAction'
+        year: 0
+        month: 0
+
+admin_rdv_calendar_toggle_timeslot:
+    path: /rdv_reparation/calendar/timeslots/toggle_timeslot_exception
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\CalendarController::toggleTimeslotExceptionAction'
+
+admin_rdv_calendar_toggle_half_day:
+    path: /rdv_reparation/calendar/timeslots/toggle_half_day
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\CalendarController::toggleHalfDayAction'
+
+
+admin_rdv_calendar_toggle_day:
+    path: /rdv_reparation/calendar/timeslots/toggle_day
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\CalendarController::toggleDayAction'
+
+admin_rdv_calendar_timeslots:
+    path: /rdv_reparation/calendar/timeslots
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\CalendarController::showTimeslotsAction'
+
+admin_rdv_reparation_prise_en_charge_decision:
+    path: /rdv_reparation/prise_en_charge_decision
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\ReparationController::priseEnChargeDecisionAction'
+        _legacy_controller: 'HsRdvReparationController'
+        _legacy_link: 'HsRdvReparationController'
+
+admin_rdv_reparation_etat_reparation:
+    path: /rdv_reparation/etat_reparation
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\ReparationController::etatReparationAction'
+        _legacy_controller: 'HsRdvReparationController'
+        _legacy_link: 'HsRdvReparationController'
+
+admin_rdv_reparation_etat_livraison:
+    path: /rdv_reparation/etat_livraison
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\ReparationController::etatLivraisonAction'
+        _legacy_controller: 'HsRdvReparationController'
+        _legacy_link: 'HsRdvReparationController'
+
+admin_rdv_reparation_generer_devis:
+    path: /rdv_reparation/generer_devis
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\ReparationController::genererDevisAction'
+        _legacy_controller: 'HsRdvReparationController'
+        _legacy_link: 'HsRdvReparationController'
+
+#####################################################
+# Type Reparation
+admin_type_reparation_list:
+    path: /type-reparation/list
+    methods: [GET]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\TypeReparationController::listAction'
+        _legacy_controller: 'HsRdvTypeReparationController'
+        _legacy_link: 'HsRdvTypeReparationController'
+
+admin_type_reparation_create:
+    path: /type-reparation/create
+    methods: [GET]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\TypeReparationController::createAction'
+
+admin_type_reparation_create_process:
+    path: /type-reparation/create
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\TypeReparationController::createProcessAction'
+        _legacy_controller: 'HsRdvTypeReparationController'
+
+admin_type_reparation_edit:
+    path: /type-reparation/edit/{typeReparationId}
+    methods: [GET]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\TypeReparationController::editAction'
+        _legacy_controller: 'HsRdvTypeReparationController'
+
+admin_type_reparation_edit_process:
+    path: /type-reparation/edit/{typeReparationId}
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\TypeReparationController::editProcessAction'
+        _legacy_controller: 'HsRdvTypeReparationController'
+
+admin_type_reparation_delete:
+    path: /type-reparation/delete/{typeReparationId}
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\TypeReparationController::deleteAction'
+        _legacy_controller: 'HsRdvTypeReparationController'
+    requirements:
+        typeReparationId: \d+
