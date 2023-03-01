@@ -415,7 +415,251 @@ class ReparationController extends FrameworkBundleAdminController
             400);
 
     }
+    public function initialDecisionBisAction(Request $request)
+    {
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse(array(
+                'status' => 'Error',
+                'message' => 'Error'),
+                400);
+        }
 
+        if(isset($request->request))
+        {
+            $appareils = !is_null($request->request->get('appareils')) ? $request->request->get('appareils') : [];
+
+            if (count($appareils) == 0)
+            {
+                return new JsonResponse(array(
+                    'status' => 'Error',
+                    'message' => 'No decision taken'),
+                    400);
+            }
+
+            $idReparation = (int)$request->request->get('id_reparation');
+            $entityManager = $this->container->get('doctrine.orm.entity_manager');
+            $appareilRepository = $entityManager->getRepository(Appareil::class);
+            $appareilsDb = $appareilRepository->findBy(['id_reparation'=> $idReparation]);
+
+            if (count($appareils) != count($appareilsDb))
+            {
+                return new JsonResponse(array(
+                    'status' => 'Error',
+                    'message' => 'Missing appareil decision'),
+                    400);
+            }
+            // Persist appareils decisions
+            foreach ($appareilsDb as $key => $appareilDb) {
+                foreach ($appareils as $k => $appareilDecision) {
+                    if ($k === $appareilDb->getId()) {
+                        if ($appareilDecision === 'Oui') {
+                            $appareilDb->setDecision(true);
+                        } else {
+                            $appareilDb->setDecision(false);
+                        };
+                        $entityManager->flush();
+                    }
+                }
+            }
+
+            $idsAppareilsOui = array_keys($appareils, "Oui");
+            $idsAppareilsNon = array_keys($appareils, "Non");
+
+            $reparationRepository = $entityManager->getRepository(Reparation::class);
+            $statusRepository = $entityManager->getRepository(Status::class);
+            $appareilRepository = $entityManager->getRepository(Appareil::class);
+            $reparation = $reparationRepository->find($idReparation);
+
+            $id_customer = $reparation->getIdClient();
+            $customer = new Customer((int)$id_customer);
+
+            if (!$customer)
+            {
+                return new JsonResponse(array(
+                    'status' => 'Error',
+                    'message' => 'customer not found'),
+                    400);
+            }
+            $from = $customer->email;
+
+
+            if  (count($idsAppareilsOui) <= 0) {
+                // Email Non
+                $reparation->setIdStatus(\Hsrdv::RDV_REFUSE);
+                $status = $statusRepository->findOneBy(['id'=> \Hsrdv::RDV_REFUSE]);
+
+
+                $appareilsDb = $appareilRepository->findBy(['id_reparation'=> $idReparation]);
+                $appareilsListString = '';
+
+                $lastAppareilKey = array_key_last($appareilsDb);
+                foreach ($appareilsDb as $key => $appareilDb) {
+                    $appareilsListString = $appareilsListString . $appareilDb->getMarque() . ' ' . $appareilDb->getReference();
+                    if ($lastAppareilKey != $key)
+                    {
+                        $appareilsListString = $appareilsListString . ', ';
+                    }
+                }
+
+                $var_list = [
+                    '{liste_appareils}' => $appareilsListString
+                ];
+
+                $sent = Mail::Send(
+                    $this->getContext()->language->id,
+                    'hsrdv_rendez_vous_refuse',
+                    $this->trans('Demande de réparation déclinée - ID: %id_reparation%', 'Modules.Hsrdv.Shop', ['%id_reparation%' => $idReparation ]),
+                    $var_list,
+                    $from,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    _PS_MAIL_DIR_,
+                    false,
+                    null,
+                    null,
+                    null
+                );
+
+            } else {
+                $status = $statusRepository->findOneBy(['id'=> \Hsrdv::PRISE_RDV]);
+                $reparation->setIdStatus(\Hsrdv::PRISE_RDV);
+                if (count($idsAppareilsOui) == count($appareils))
+                {
+                    $reparationToken = $reparation->getToken();
+                    $linkInMail = $this->getContext()->link->getModuleLink('hsrdv', 'calendar')
+                        . '?reparationToken=' . $reparationToken
+                        // Here we use current month, but it should be the first month that has availabity
+                        // todo: add method getFisrtMonthWithAvailabitity()
+                        . '&month=' . idate('m')
+                        . '&year=' . idate('y')
+                    ;
+
+                    $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId()]);
+                    $appareilsListString = '';
+
+                    $lastAppareilKey = array_key_last($appareils);
+                    foreach ($appareils as $key => $appareil) {
+                        $appareilsListString = $appareilsListString . $appareil->getMarque() . ' ' . $appareil->getReference();
+                        if ($lastAppareilKey != $key)
+                        {
+                            $appareilsListString = $appareilsListString . ', ';
+                        }
+                    }
+
+                    $var_list = [
+                        '{liste_appareils}' => $appareilsListString,
+                        '{link_mail}' => $linkInMail
+                    ];
+
+                    $sent = Mail::Send(
+                        $this->getContext()->language->id,
+                        'hsrdv_acceptation_prise_rendez_vous',
+                        $this->trans('Demande de réparation acceptée - %id_reparation%', 'Modules.Hsrdv.Shop', ['%id_reparation%' => $idReparation ]),
+                        $var_list,
+                        $from,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        _PS_MAIL_DIR_,
+                        false,
+                        null,
+                        null,
+                        null
+                    );
+
+                } elseif ( count($idsAppareilsOui) < count($appareils)) {
+
+                    $reparationToken = $reparation->getToken();
+                    $linkInMail = $this->getContext()->link->getModuleLink('hsrdv', 'calendar')
+                        . '?reparationToken=' . $reparationToken
+                        . '&month=' . idate('m')
+                        . '&year=' . idate('y')
+                    ;
+
+                    $appareilsOuiListString = $appareilsNonListString = '';
+
+                    $appareilsOui = $appareilRepository->findBy(['id'=> $idsAppareilsOui]);
+                    $appareilsNon = $appareilRepository->findBy(['id'=> $idsAppareilsNon]);
+
+
+                    $lastAppareilOuiKey = array_key_last($appareilsOui);
+                    foreach ($appareilsOui as $key => $appareil) {
+                        $appareilsOuiListString = $appareilsOuiListString . $appareil->getMarque() . ' ' . $appareil->getReference();
+                        if ($lastAppareilOuiKey != $key)
+                        {
+                            $appareilsOuiListString = $appareilsOuiListString . ', ';
+                        }
+                    }
+
+                    $lastAppareilNonKey = array_key_last($appareilsNon);
+                    foreach ($appareilsNon as $key => $appareil) {
+                        $appareilsNonListString = $appareilsNonListString . $appareil->getMarque() . ' ' . $appareil->getReference();
+                        if ($lastAppareilNonKey != $key)
+                        {
+                            $appareilsNonListString = $appareilsNonListString . ', ';
+                        }
+                    }
+
+                    $var_list = [
+                        '{liste_appareils_oui}' => $appareilsOuiListString,
+                        '{liste_appareils_non}' => $appareilsNonListString,
+                        '{link_mail}' => $linkInMail
+                    ];
+
+                    $sent = Mail::Send(
+                        $this->getContext()->language->id,
+                        'hsrdv_acceptation_prise_rendez_vous_partielle',
+                        $this->trans('Demande de réparation partiellement acceptée - ID: %id_reparation%', 'Modules.Hsrdv.Shop', ['%id_reparation%' => $idReparation ]),
+                        $var_list,
+                        $from,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        _PS_MAIL_DIR_,
+                        false,
+                        null,
+                        null,
+                        null
+                    );
+                }
+            }
+
+            if (!$sent)
+            {
+                return new JsonResponse(array(
+                    'status' => 'Error',
+                    'message' => 'Mail not successfuly sent'),
+                    400);
+            }
+
+            $entityManager->persist($reparation);
+            $entityManager->flush();
+
+            $rdvStatus = [
+                'message' => $status->getMessage(),
+                'color' => $status->getColor()
+            ];
+
+            return new JsonResponse(array(
+                'status' => 'OK',
+                'rdv_status' => $rdvStatus,
+                'message' => []),
+                200);
+        }
+
+        return new JsonResponse(array(
+            'status' => 'Error',
+            'message' => 'Error'),
+            400);
+
+    }
     public function priseEnChargeDecisionAction(Request $request)
     {
 
