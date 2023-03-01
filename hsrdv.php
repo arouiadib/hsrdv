@@ -40,19 +40,18 @@ class Hsrdv extends Module implements WidgetInterface
     const ENQUETE = 10;
 
     const STATUSES = [
-        'DEMANDE_REPARATION' => [ 'title' => 'Demande de réparation', 'color' => 'yellow'],
-        'PRISE_RDV' => [ 'title' => 'Prise de rendez-vous', 'color' => 'lime'],
-        'RDV_REFUSE' => [ 'title' => 'Rendez-vous refusé', 'color' => 'tomato'],
-        'RDV_PRIS' => [ 'title' => 'Rendez-vous pris', 'color' => 'yellowgreen'],
-        'REPARATION_EN_COURS' => [ 'title' => 'Réparation en cours', 'color' => 'steelblue'],
-        'NON_PRIS_EN_CHARGE' => [ 'title' => 'Non pris en charge', 'color' => 'red'],
-        'REPARE' => [ 'title' => 'Réparé', 'color' => 'green'],
-        'A_LIVRER' => [ 'title' => 'A Livrer', 'color' => 'grey'],
-        'LIVRE' => [ 'title' => 'Livré', 'color' => 'blue'],
-        'ENQUETE' => [ 'title' => 'Enquête de satisfaction', 'color' => 'purple']
+        'DEMANDE_REPARATION' => [ 'title' => 'Demande de réparation', 'color' => '#faff0b'],
+        'PRISE_RDV' => [ 'title' => 'Prise de rendez-vous', 'color' => '#24ff23'],
+        'RDV_REFUSE' => [ 'title' => 'Rendez-vous refusé', 'color' => '#ff4727'],
+        'RDV_PRIS' => [ 'title' => 'Rendez-vous pris', 'color' => '#26aa00'],
+        'REPARATION_EN_COURS' => [ 'title' => 'Réparation en cours', 'color' => '#005d9a'],
+        'NON_PRIS_EN_CHARGE' => [ 'title' => 'Non pris en charge', 'color' => '#fe1600'],
+        'REPARE' => [ 'title' => 'Réparé', 'color' => '#0a5e00'],
+        'A_LIVRER' => [ 'title' => 'A Livrer', 'color' => '#b7b9ff'],
+        'LIVRE' => [ 'title' => 'Livré', 'color' => '#0500ce'],
+        'ENQUETE' => [ 'title' => 'Enquête de satisfaction', 'color' => '#ff37dc']
     ];
-
-
+    
     /* @var ReparationRepository */
     private $reparationRepository;
 
