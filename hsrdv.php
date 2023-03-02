@@ -731,10 +731,22 @@ class Hsrdv extends Module implements WidgetInterface
     /**
      * Displays First decision form
      */
-    public function hookDisplayAdminOrderSide(array $params)
+    public function hookDisplayAdminOrderMain(array $params)
     {
+        $finalStatuses = [];
+        $statuses = Hsrdv::STATUSES;
+        $dbStatuses = OrderState::getOrderStates($this->context->language->id);
 
+        foreach ($dbStatuses as $dbStatus) {
+            foreach ($statuses as $key => $status) {
+                if ($status['title'] == $dbStatus['name'] ) {
+                    $finalStatuses[$key] = (int)$dbStatus['id_order_state'];
+                }
+            }
 
+        }
+
+        //var_dump($finalStatuses);die;
         /** @var OrderSignatureRepository $signatureRepository */
        /* $signatureRepository = $this->get(
             'prestashop.module.demovieworderhooks.repository.order_signature_repository'
@@ -763,14 +775,8 @@ class Hsrdv extends Module implements WidgetInterface
             $reparationRepository = $entityManager->getRepository(\PrestaShop\Module\HsRdv\Entity\Reparation::class);
             $reparation = $reparationRepository->findOneBy(['idOrder'=> (int)$params['id_order']]);
 
-            //$statusRepository = $entityManager->getRepository(Status::class);
-            //$status = $statusRepository->findOneBy(['id'=> $reparation->getIdStatus()]);
-
             $appareilRepository = $entityManager->getRepository(\PrestaShop\Module\HsRdv\Entity\Appareil::class);
             $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId()]);
-
-            //var_dump($appareils);die;
-            $customer = new Customer((int)$reparation->getIdClient());
 
             foreach ($appareils as $appareil) {
                 $presentedReparation['appareils'][] = [
@@ -812,34 +818,20 @@ class Hsrdv extends Module implements WidgetInterface
 
             $status = new OrderState((int)$order->current_state);
 
-
             $presentedReparation['status'] = [
                 'id_status' => $status->id,
                 'message' => $status->name,
                 'color' => $status->color
             ];
 
-            $presentedReparation['client'] = [
-                'nom' => $customer->lastname,
-                'prenom' => $customer->firstname,
-                'email' => $customer->email,
-                'phone' => '',
-                'addresse_postale' => ''
-                // todo: get these from address object
-                //'phone' => $customer->phone,
-                //'addresse_postale' => $customer->getAddressePostale()
-            ];
-
-
             $typeReparationReparation = $entityManager->getRepository(TypeReparation::class);
             $typesReparation = $typeReparationReparation->findAll();
-
-            //var_dump($typesReparation);die;
 
             return $this->render('@Modules/hsrdv/views/templates/admin/reparation/initial_decision_form.html.twig', [
                 'id_order' => $params['id_order'],
                 'presented_reparation' => $presentedReparation,
                 'types_reparation' => $typesReparation,
+                'statuses' => $finalStatuses,
                 'initial_decision_form_action' => $this->get('router')->generate('admin_rdv_reparation_inital_decision_bis'),
                 'prise_en_charge_decision_form_action' => $this->get('router')->generate('admin_rdv_reparation_prise_en_charge_decision'),
                 'etat_reparation_form_action' => $this->get('router')->generate('admin_rdv_reparation_etat_reparation'),

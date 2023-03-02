@@ -5,52 +5,6 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                  <h3 class="card-header">
-                      {{ 'Informations sur le client:'|trans({}, 'Modules.Hsrdv.Admin') }}
-                  </h3>
-                  <div class="card-body">
-                      {% if presented_reparation.client is not empty %}
-                          <div class="commande-line">
-                              <span class="line-title">{{ 'Email Client'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                              <span class="line-content">{{ presented_reparation.client.email }}</span>
-                          </div>
-                      {% endif %}
-
-                      {% if presented_reparation.client.nom is not empty %}
-                          <div class="commande-line">
-                              <span class="line-title">{{ 'Nom Client'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                              <span class="line-content">{{ presented_reparation.client.nom }}</span>
-                          </div>
-                      {% endif %}
-
-                      {% if presented_reparation.client.prenom is not empty %}
-                          <div class="commande-line">
-                              <span class="line-title">{{ 'Prenom Client'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                              <span class="line-content">{{ presented_reparation.client.prenom }}</span>
-                          </div>
-                      {% endif %}
-
-                      {% if presented_reparation.client.phone is not empty %}
-                          <div class="commande-line">
-                              <span class="line-title">{{ 'Telephone Client'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                              <span class="line-content">{{ presented_reparation.client.phone }}</span>
-                          </div>
-                      {% endif %}
-
-                      {% if presented_reparation.client.addresse_postale is not empty %}
-                          <div class="commande-line">
-                              <span class="line-title">{{ 'Addresse Client'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                              <span class="line-content">{{ presented_reparation.client.addresse_postale }}</span>
-                          </div>
-                      {% endif %}
-                      </div>
-                </div>
-            </div>
-        </div>
-
         <div class="row mt-3">
             <div class="col">
                 <div class="card">
@@ -81,7 +35,7 @@
                                                          name="appareils[{{ appareil.id_appareil }}]"
                                                          value="{{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}"
                                                          {% if appareil.decision == true %}checked="checked"{% endif %}
-                                                         {% if presented_reparation.status.id_status != 1  %}disabled{% endif %}
+                                                         {% if presented_reparation.status.id_status != statuses['DEMANDE_REPARATION']  %}disabled{% endif %}
                                                   >
                                                   {{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}
                                               </label>
@@ -91,7 +45,7 @@
                                                          name="appareils[{{ appareil.id_appareil }}]"
                                                          value="{{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}"
                                                          {% if appareil.decision == false and not appareil.decision is same as(null) %}checked="checked"{% endif %}
-                                                         {% if presented_reparation.status.id_status != 1  %}disabled{% endif %}
+                                                         {% if presented_reparation.status.id_status != statuses['DEMANDE_REPARATION']  %}disabled{% endif %}
                                                   >
                                                   {{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}
                                               </label>
@@ -106,7 +60,7 @@
                                             <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
                                             <input class="" name="submitMessage"
                                                    value="{{ 'Envoyer réponse'|trans({}, 'Modules.Hsrdv.Admin') }}"
-                                                   {% if presented_reparation.status.id_status  >= 2 %} disabled {% endif %}
+                                                   {% if presented_reparation.status.id_status  >= statuses['PRISE_RDV'] %} disabled {% endif %}
                                                    type="submit">
                                         </span>
                                     </div>
