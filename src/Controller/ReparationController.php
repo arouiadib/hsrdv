@@ -21,6 +21,9 @@ use Hrdv;
 use Mail;
 use DateTime;
 use Customer;
+use OrderState;
+use Order;
+use Hsrdv;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use PrestaShop\Module\HsRdv\Calendar\Calendar;
 
@@ -419,32 +422,12 @@ class ReparationController extends FrameworkBundleAdminController
 
     public function initialDecisionBisAction(Request $request)
     {
-/*        if (!$request->isXmlHttpRequest()) {
-            return new JsonResponse(array(
-                'status' => 'Error',
-                'message' => 'Error'),
-                400);
-        }*/
-
         if(isset($request->request))
         {
-
-            $state_exist = false;
-            $states = OrderState::getOrderStates((int)$this->getContext()->language->id);
-
-            var_dump($states);die;
-
-
-            // check if order state exist
-            foreach ($states as $state) {
-                if (in_array($title, $state)) {
-                    $state_exist = true;
-                    break;
-                }
-            }
-
+            $states = $this->getOrderStatuses();
 
             $orderId = $request->request->get('id_order');
+            $order = new Order((int)$orderId);
             $appareils = !is_null($request->request->get('appareils')) ? $request->request->get('appareils') : [];
 
            /* if (count($appareils) == 0)
@@ -486,7 +469,6 @@ class ReparationController extends FrameworkBundleAdminController
             $idsAppareilsNon = array_keys($appareils, "Non");
 
             $reparationRepository = $entityManager->getRepository(Reparation::class);
-            $statusRepository = $entityManager->getRepository(Status::class);
             $appareilRepository = $entityManager->getRepository(Appareil::class);
             $reparation = $reparationRepository->find($idReparation);
 
@@ -506,8 +488,7 @@ class ReparationController extends FrameworkBundleAdminController
             if  (count($idsAppareilsOui) <= 0) {
                 // Email Non
                 $reparation->setIdStatus(\Hsrdv::RDV_REFUSE);
-                $status = $statusRepository->findOneBy(['id'=> \Hsrdv::RDV_REFUSE]);
-
+                $order->current_state = $states['RDV_REFUSE'];
 
                 $appareilsDb = $appareilRepository->findBy(['id_reparation'=> $idReparation]);
                 $appareilsListString = '';
@@ -544,8 +525,8 @@ class ReparationController extends FrameworkBundleAdminController
                 );
 
             } else {
-                $status = $statusRepository->findOneBy(['id'=> \Hsrdv::PRISE_RDV]);
                 $reparation->setIdStatus(\Hsrdv::PRISE_RDV);
+                $order->current_state = $states['PRISE_RDV'];
                 if (count($idsAppareilsOui) == count($appareils))
                 {
                     $reparationToken = $reparation->getToken();
@@ -662,20 +643,11 @@ class ReparationController extends FrameworkBundleAdminController
             $entityManager->persist($reparation);
             $entityManager->flush();
 
-            $rdvStatus = [
-                'message' => $status->getMessage(),
-                'color' => $status->getColor()
-            ];
-
+            $order->update();
 
             return $this->redirectToRoute('admin_orders_view', [
                 'orderId' => $orderId,
             ]);
-           /* return new JsonResponse(array(
-                'status' => 'OK',
-                'rdv_status' => $rdvStatus,
-                'message' => []),
-                200);*/
         }
 
         return new JsonResponse(array(
@@ -1057,5 +1029,22 @@ class ReparationController extends FrameworkBundleAdminController
     {
         return [
         ];
+    }
+
+    private function getOrderStatuses() {
+        $finalStatuses = [];
+        $statuses = Hsrdv::STATUSES;
+        $dbStatuses = OrderState::getOrderStates($this->getContext()->language->id);
+
+        foreach ($dbStatuses as $dbStatus) {
+            foreach ($statuses as $key => $status) {
+                if ($status['title'] == $dbStatus['name'] ) {
+                    $finalStatuses[$key] = (int)$dbStatus['id_order_state'];
+                }
+            }
+
+        }
+
+        return $finalStatuses;
     }
 }
