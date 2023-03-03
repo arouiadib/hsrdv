@@ -38,6 +38,12 @@ class Appareil extends \ObjectModel
      * @var int
      */
     public $id_reparation;
+
+    /**
+     * @var int
+     */
+    public $id_order;
+
     /**
      * @var string
      */
@@ -57,6 +63,7 @@ class Appareil extends \ObjectModel
             'descriptif_panne' => array('type' => self::TYPE_STRING),
             'id_type_reparation' => array('type' => self::TYPE_INT),
             'id_reparation' => array('type' => self::TYPE_INT),
+            'id_order' => array('type' => self::TYPE_INT),
             'remarques_specifique' => array('type' => self::TYPE_STRING),
         ),
     );
@@ -89,6 +96,7 @@ class Appareil extends \ObjectModel
             'descriptif_panne' => $this->descriptif_panne,
             'id_type_reparation' => $this->id_type_reparation,
             'id_reparation' => $this->id_reparation,
+            'id_order' => $this->id_order,
             'remarques_specifique' => $this->remarques_specifique
         ];
     }

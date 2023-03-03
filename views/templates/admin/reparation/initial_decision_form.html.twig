@@ -73,7 +73,9 @@
             </div>
         </div>
 
-        {% if presented_reparation.status.id_status >= 4  %}
+        {{ dump(presented_reparation.status.id_status) }}
+        {{ dump(statuses['RDV_PRIS']) }}
+        {% if presented_reparation.status.id_status >= statuses['RDV_PRIS']  %}
         <div class="row">
             <div class="col">
                 <div class="card">
@@ -87,10 +89,10 @@
                                        id=""
                                        name="decision_prise_en_charge"
                                        class="checkbox"
-                                       value={% if presented_reparation.status.id_status  >= 5 %} disabled {% endif %}"{{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}"
+                                       value={% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}"{{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}"
 
-                                        {% if presented_reparation.status.id_status == 5 %} checked="checked" {% endif %}
-                                        {% if presented_reparation.status.id_status  >= 5 %} disabled {% endif %}
+                                        {% if presented_reparation.status.id_status == statuses['REPARATION_EN_COURS'] %} checked="checked" {% endif %}
+                                        {% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                                 >
                                 {{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}
                             </label>
@@ -101,19 +103,19 @@
                                        name="decision_prise_en_charge"
                                        class="checkbox"
                                        value="{{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}"
-                                        {% if presented_reparation.status.id_status == 6 %} checked="checked" {% endif %}
-                                        {% if presented_reparation.status.id_status >= 5 %} disabled {% endif %}
+                                        {% if presented_reparation.status.id_status == statuses['NON_PRIS_EN_CHARGE'] %} checked="checked" {% endif %}
+                                        {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                                 >
                                 {{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}
                             </label>
                             <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
                             <input name="submitFeedback"
                                    value="{{ 'Valider'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
-                                    {% if presented_reparation.status.id_status >= 5 %} disabled {% endif %}
+                                    {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                             >
                         </form>
                     </div>
-                    <div id="devis-form" class="card-body row"  {% if presented_reparation.status.id_status < 5 or presented_reparation.status.id_status == 6  %}style="display: none;" {% endif %}>
+                    {#<div id="devis-form" class="card-body row"  {% if presented_reparation.status.id_status < 5 or presented_reparation.status.id_status == 6  %}style="display: none;" {% endif %}>
                         <div class="col-md-9">
                             <form action="{{ generation_devis_form_action }}" method="POST" data-action="generation-devis">
                                 <div id="LabelForAppareils">
@@ -247,7 +249,7 @@
                                 {{ 'Generer Devis'|trans({}, 'Modules.Hsrdv.Admin') }}
                             </a>
                         </div>
-                    </div>
+                    </div>#}
                 </div>
             </div>
         </div>

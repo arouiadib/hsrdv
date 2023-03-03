@@ -397,6 +397,7 @@ class HsRdvProcessRdvInitialModuleFrontController extends ModuleFrontController 
             $persitedAppareil->reference = $appareil['reference'];
             $persitedAppareil->descriptif_panne = $appareil['descriptif_panne'];
             $persitedAppareil->id_reparation = $reparation->id;
+            $persitedAppareil->id_reparation = $order->id;
             if (!$persitedAppareil->add()) {
                 $this->context->controller->errors[] = $this->trans(
                     'An error occurred while creating appareil record',

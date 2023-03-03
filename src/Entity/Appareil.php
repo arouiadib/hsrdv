@@ -51,6 +51,29 @@ class Appareil
     private $id_reparation;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="id_reparation", type="integer")
+     */
+    private $id_order;
+
+    /**
+     * @return int
+     */
+    public function getIdOrder()
+    {
+        return $this->id_order;
+    }
+
+    /**
+     * @param int $id_order
+     */
+    public function setIdOrder($id_order)
+    {
+        $this->id_order = $id_order;
+    }
+
+    /**
      * @var boolean
      *
      * @ORM\Column(name="decision", type="boolean")

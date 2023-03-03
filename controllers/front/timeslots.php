@@ -94,6 +94,8 @@ class HsRdvTimeslotsModuleFrontController extends ModuleFrontController
 
         if ($addressId) {
             $address = new Address($addressId);
+        } else {
+            $address = new Address();
         }
 
         $this->booking['nom'] = $customer->lastname;
