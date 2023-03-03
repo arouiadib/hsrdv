@@ -109,7 +109,7 @@
                                 {{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}
                             </label>
                             <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
-                            <input name="submitFeedback"
+                            <input class="btn btn-primary" name="submitFeedback"
                                    value="{{ 'Valider'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
                                     {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                             >

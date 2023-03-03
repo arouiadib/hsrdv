@@ -53,7 +53,7 @@ class Appareil
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_reparation", type="integer")
+     * @ORM\Column(name="id_order", type="integer")
      */
     private $id_order;
 

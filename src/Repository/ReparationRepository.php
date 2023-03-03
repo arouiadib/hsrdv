@@ -94,6 +94,7 @@ class ReparationRepository
     			`descriptif_panne` text default NULL,
     			`id_type_reparation` int(10) unsigned NOT NULL,
     			`id_reparation` int(10) unsigned NOT NULL,
+    			`id_order` int(10) unsigned NOT NULL,
     			`remarques_specifique` text default NULL,
     			`decision` boolean default NULL,
     			PRIMARY KEY (`id_appareil`)
