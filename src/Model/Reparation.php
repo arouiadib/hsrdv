@@ -120,7 +120,7 @@ class Reparation extends \ObjectModel
 
     public static function getReparationFromToken($token)
     {
-        $sql = 'SELECT r.id_reparation, r.`id_client`  FROM ' . _DB_PREFIX_ . 'hsrdv_reparation r WHERE r.token = "'.$token. '"';
+        $sql = 'SELECT r.id_reparation, r.`id_client`, r.`id_order`  FROM ' . _DB_PREFIX_ . 'hsrdv_reparation r WHERE r.token = "'.$token. '"';
 
         return Db::getInstance()->getRow($sql);
     }

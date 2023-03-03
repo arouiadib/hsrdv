@@ -51,6 +51,7 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         $this->booking['email'] =  Tools::getValue('email');
         $this->booking['appareils'] =  $appareils;
         $this->booking['id_reparation'] =  Tools::getValue('id_reparation');
+        $this->booking['id_order'] =  Tools::getValue('id_order');
 
         return $this->booking;
     }
@@ -170,6 +171,7 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         $addresse_postale = trim(Tools::getValue('addresse_postale'));
         $telephone =  trim(Tools::getValue('telephone'));
         $idReparation = (int) Tools::getValue('id_reparation');
+        $idOrder = (int) Tools::getValue('id_order');
         $time = trim(Tools::getValue('time'));
         $date = trim(Tools::getValue('date'));
 
@@ -243,8 +245,14 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         else {
             $address->add();
         }
-
+        $order = new Order((int)$idOrder);
+        var_dump($idOrder);
+        var_dump($order->id_address_delivery);die;
+        $states = $this->getOrderStatuses();
+        $order->current_state = $states['RDV_PRIS'];
+        $order->update();
         if ($customer->update()) {
+
             $reparation->id_status = $this->module :: RDV_PRIS;
             $reparation->update();
             $appareilsListString = '';
@@ -364,5 +372,22 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         }
 
         return $slots;
+    }
+
+    private function getOrderStatuses() {
+        $finalStatuses = [];
+        $statuses = Hsrdv::STATUSES;
+        $dbStatuses = OrderState::getOrderStates($this->context->language->id);
+
+        foreach ($dbStatuses as $dbStatus) {
+            foreach ($statuses as $key => $status) {
+                if ($status['title'] == $dbStatus['name'] ) {
+                    $finalStatuses[$key] = (int)$dbStatus['id_order_state'];
+                }
+            }
+
+        }
+
+        return $finalStatuses;
     }
 }

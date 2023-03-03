@@ -105,6 +105,7 @@ class HsRdvTimeslotsModuleFrontController extends ModuleFrontController
         $this->booking['addresse_postale'] = $address->address1;
         $this->booking['appareils'] = $appareils;
         $this->booking['id_reparation'] = $reparation['id_reparation'];
+        $this->booking['id_order'] = $reparation['id_order'];
 
         return $this->booking;
     }
