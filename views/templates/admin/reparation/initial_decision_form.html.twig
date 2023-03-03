@@ -73,8 +73,6 @@
             </div>
         </div>
 
-        {{ dump(presented_reparation.status.id_status) }}
-        {{ dump(statuses['RDV_PRIS']) }}
         {% if presented_reparation.status.id_status >= statuses['RDV_PRIS']  %}
         <div class="row">
             <div class="col">
@@ -115,149 +113,14 @@
                             >
                         </form>
                     </div>
-                    {#<div id="devis-form" class="card-body row"  {% if presented_reparation.status.id_status < 5 or presented_reparation.status.id_status == 6  %}style="display: none;" {% endif %}>
-                        <div class="col-md-9">
-                            <form action="{{ generation_devis_form_action }}" method="POST" data-action="generation-devis">
-                                <div id="LabelForAppareils">
-                                    {{ 'Détails devis:'|trans({}, 'Modules.Hsrdv.Admin') }}
-                                </div>
-                                <div>
-                                    <label for="" class="required">{{ 'Acompte'|trans({}, 'Modules.Hsrdv.Admin') }}
-                                    <input type="textarea" class="form-control" name="acompte" value="{% if presented_reparation.devis.acompte is defined %}{{ presented_reparation.devis.acompte }} {% endif %}" />
-                                    </label>
-                                </div>
-                                <div id="lignes-container" >
-                                    <div id="tab-content" >
-                                        <table id="devis-table" class="table">
-                                            <thead>
-                                            <tr>
-                                                <th>{{ 'Numéro'|trans({}, 'Modules.Hsrdv.Admin') }}</th>
-                                                <th>{{ 'Appareil'|trans({}, 'Modules.Hsrdv.Admin') }}</th>
-                                                <th>{{ 'Type Réparation'|trans({}, 'Modules.Hsrdv.Admin') }}</th>
-                                                <th>{{ 'Prix'|trans({}, 'Modules.Hsrdv.Admin') }}</th>
-                                                <th>{{ 'Supprimer'|trans({}, 'Modules.Hsrdv.Admin') }}</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% if presented_reparation.devis.devis_lignes is defined %}
-                                            {% for ligne in presented_reparation.devis.devis_lignes %}
-                                                {% set firstLoopIndex = loop.index - 1 %}
-
-                                                <tr class="form-group-line devis-line" id="form-element-{{ firstLoopIndex }}">
-                                                    <td>{{ loop.index }}</td>
-                                                    <td>
-                                                        {% for appareil in presented_reparation.appareils %}
-                                                            <div>
-                                                                <label>
-                                                                    <input type="radio" name="lines[{{ firstLoopIndex }}][appareil]"
-                                                                           value="{{ appareil.id_appareil }}"
-                                                                            {% if appareil.id_appareil == ligne.id_appareil  %} checked="checked" {% endif %}>
-                                                                        {{ appareil.marque }} {{ appareil.reference }}
-                                                                    </input>
-                                                                </label>
-                                                            </div>
-                                                        {% endfor %}
-                                                    </td>
-                                                    <td>
-                                                        <select class="custom-select" name="lines[{{ firstLoopIndex }}][id_type_reparation]">
-
-                                                            {% for type_reparation in types_reparation %}
-                                                                <option value="{{ type_reparation.id }}"
-                                                                {% if type_reparation.id == ligne.id_type_reparation %}selected{% endif %}
-                                                                >{{ type_reparation.name }}</option>
-                                                            {% endfor %}
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <input
-                                                            class="form-control reference"
-                                                            name="lines[{{ firstLoopIndex }}][price]"
-                                                            type="text"
-                                                            value="{{ ligne.price }}"
-                                                        >
-                                                    </td>
-                                                    <td>
-                                                        <button id="remove-line-{{ firstLoopIndex }}" class="remove-line">X</button>
-                                                    </td>
-                                                </tr>
-                                            {% endfor %}
-                                            {% endif %}
-                                            <tr class="form-group-line devis-line dummy-devis-ligne" style="display: none;">
-                                                <td></td>
-                                                <td>
-                                                    {% for appareil in presented_reparation.appareils %}
-                                                        <div>
-                                                            <label>
-                                                                <input type="radio" name="dummyline[appareil]"
-                                                                       value="{{ appareil.id_appareil }}"/>
-                                                                    {{ appareil.marque }} {{ appareil.reference }}
-                                                            </label>
-                                                        </div>
-                                                    {% endfor %}
-                                                </td>
-                                                <td>
-                                                    <select class="custom-select" name="dummyline[id_type_reparation]">
-                                                        <option selected="selected"></option>
-                                                        {% for type_reparation in types_reparation %}
-                                                            <option value="{{ type_reparation.id }}">{{ type_reparation.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        class="form-control reference"
-                                                        name="dummyline[price]"
-                                                        type="text"
-                                                        value=""
-                                                    >
-                                                </td>
-                                                <td>
-                                                    <button id="remove-line-" class="remove-line">X</button>
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div id="addLineDevis">
-                                        <input class=""
-                                               name="addSubForm"
-                                               data-button-action="addLine"
-                                               value="{{ 'Ajouter ligne'|trans({}, 'Modules.Hsrdv.Admin') }}"
-                                               type="button">
-                                    </div>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div id="remarques_specifiques">
-                                    <label for="" class="required">{{ 'Remarques Spécifiques'|trans({}, 'Modules.Hsrdv.Admin') }}</label>
-                                        <textarea class="form-control" name="remarques_specifiques">
-                                            {% if presented_reparation.devis.remarques_specifiques is defined %}{{ presented_reparation.devis.remarques_specifiques }} {% endif %}
-                                        </textarea>
-
-                                </div>
-                                <input type="hidden"  name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
-                                <input type="hidden"  name="id_order" value="{{ id_order }}" />
-                                <input type="submit" class="btn btn-primary" name="submitFeedback"
-                                       value="{{ 'Enregistrer'|trans({}, 'Modules.Hsrdv.Admin') }}"
-                                >
-                            </form>
-                        </div>
-                        <div class="col-md-3">
-                            <a class="btn btn-primary btn-large"
-                               target="_blank" rel="noopener noreferrer nofollow"
-                               href="{{ getAdminLink('AdminDevisGenPDF', true, {'submitAction': 'testSomeCode', 'id_reparation': 1}) }}"
-                            >
-                                {{ 'Generer Devis'|trans({}, 'Modules.Hsrdv.Admin') }}
-                            </a>
-                        </div>
-                    </div>#}
                 </div>
             </div>
         </div>
         {% endif %}
 
 
-        {% if presented_reparation.status.id_status >= 5 and presented_reparation.status.id_status != 6  %}
-{#            <div class="row">
+        {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] and presented_reparation.status.id_status != statuses['NON_PRIS_EN_CHARGE']  %}
+            <div class="row">
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
@@ -278,7 +141,7 @@
                         </div>
                     </div>
                 </div>
-            </div>#}
+            </div>
         {% endif %}
 
 

@@ -659,12 +659,12 @@ class ReparationController extends FrameworkBundleAdminController
     public function priseEnChargeDecisionAction(Request $request)
     {
 
-        if (!$request->isXmlHttpRequest()) {
+/*        if (!$request->isXmlHttpRequest()) {
             return new JsonResponse(array(
                 'status' => 'Error',
                 'message' => 'Error'),
                 400);
-        }
+        }*/
 
         if(isset($request->request))
         {
@@ -672,7 +672,6 @@ class ReparationController extends FrameworkBundleAdminController
 
             $entityManager = $this->container->get('doctrine.orm.entity_manager');
             $reparationRepository = $entityManager->getRepository(Reparation::class);
-            $statusRepository = $entityManager->getRepository(Status::class);
             $appareilRepository = $entityManager->getRepository(Appareil::class);
 
             $reparation = $reparationRepository->find((int)$request->request->get('id_reparation'));
@@ -683,7 +682,6 @@ class ReparationController extends FrameworkBundleAdminController
 
             $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId()]);
             $appareilsListString = '';
-
             $lastAppareilKey = array_key_last($appareils);
             foreach ($appareils as $key => $appareil) {
                 $appareilsListString = $appareilsListString . $appareil->getMarque() . ' ' . $appareil->getReference();
@@ -699,11 +697,15 @@ class ReparationController extends FrameworkBundleAdminController
                 '{liste_appareils}' => $appareilsListString,
             ];
 
+            $idOrder = $reparation->getIdOrder();
+            $order = new Order((int)$idOrder);
+
+            $states = $this->getOrderStatuses();
+
             if  ($decision_prise_en_charge === 'Oui') {
                 // Email Non
                 $reparation->setIdStatus(\Hsrdv::REPARATION_EN_COURS);
-                $status = $statusRepository->findOneBy(['id'=> \Hsrdv::REPARATION_EN_COURS]);
-
+                $order->current_state = $states['REPARATION_EN_COURS'];
                 $sent = Mail::Send(
                     $this->getContext()->language->id,
                     'hsrdv_reparation_en_cours',
@@ -724,9 +726,8 @@ class ReparationController extends FrameworkBundleAdminController
                 );
 
             } else {
-                $status = $statusRepository->findOneBy(['id'=> \Hsrdv::NON_PRIS_EN_CHARGE]);
                 $reparation->setIdStatus(\Hsrdv::NON_PRIS_EN_CHARGE);
-
+                $order->current_state = $states['NON_PRIS_EN_CHARGE'];
                 $sent = Mail::Send(
                     $this->getContext()->language->id,
                     'hsrdv_non_pris_en_charge',
@@ -757,19 +758,19 @@ class ReparationController extends FrameworkBundleAdminController
 
             $entityManager->persist($reparation);
             $entityManager->flush();
+            $order->update();
 
-            $rdvStatus = [
-                'message' => $status->getMessage(),
-                'color' => $status->getColor(),
-            ];
+            return $this->redirectToRoute('admin_orders_view', [
+                'orderId' => $idOrder,
+            ]);
 
-            return new JsonResponse(array(
+           /* return new JsonResponse(array(
                     'status' => 'OK',
                     'rdv_status' => $rdvStatus,
                     'prise_en_charge' => $decision_prise_en_charge === 'Oui' ? 1 : 0,
                     'message' => []
                 ),
-                200);
+                200);*/
         }
 
         return new JsonResponse(array(

@@ -246,8 +246,6 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
             $address->add();
         }
         $order = new Order((int)$idOrder);
-        var_dump($idOrder);
-        var_dump($order->id_address_delivery);die;
         $states = $this->getOrderStatuses();
         $order->current_state = $states['RDV_PRIS'];
         $order->update();
