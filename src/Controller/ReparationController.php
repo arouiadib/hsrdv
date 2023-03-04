@@ -839,44 +839,30 @@ class ReparationController extends FrameworkBundleAdminController
     public function etatLivraisonAction(Request $request)
     {
 
-        if (!$request->isXmlHttpRequest()) {
-            return new JsonResponse(array(
-                'status' => 'Error',
-                'message' => 'Error'),
-                400);
-        }
-
         if(isset($request->request))
         {
             $entityManager = $this->container->get('doctrine.orm.entity_manager');
             $reparationRepository = $entityManager->getRepository(Reparation::class);
-            $statusRepository = $entityManager->getRepository(Status::class);
 
             $reparation = $reparationRepository->find((int)$request->request->get('id_reparation'));
-
             $reparation->setIdStatus(\Hsrdv::LIVRE);
             $reparation->setDateLivraison(new \DateTime());
-            $status = $statusRepository->findOneBy(['id'=> \Hsrdv::LIVRE]);
 
             $entityManager->persist($reparation);
             $entityManager->flush();
 
-            $rdvStatus = [
-                'message' => $status->getMessage(),
-                'color' => $status->getColor()
-            ];
+            $idOrder = $reparation->getIdOrder();
+            $order = new Order((int)$idOrder);
 
-            return new JsonResponse(array(
-                'status' => 'OK',
-                'rdv_status' => $rdvStatus,
-                'message' => []),
-                200);
+            $states = $this->getOrderStatuses();
+            $order->current_state = $states['LIVRE'];
+
+            $order->update();
+
+            return $this->redirectToRoute('admin_orders_view', [
+                'orderId' => $idOrder,
+            ]);
         }
-
-        return new JsonResponse(array(
-            'status' => 'Error',
-            'message' => 'Error'),
-            400);
 
     }
 

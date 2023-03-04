@@ -815,7 +815,6 @@ class Hsrdv extends Module implements WidgetInterface
             $presentedReparation['date_reparation'] = $reparation->getDateReparation();
             $presentedReparation['date_livraison'] = $reparation->getDateLivraison();
 
-
             $status = new OrderState((int)$order->current_state);
 
             $presentedReparation['status'] = [

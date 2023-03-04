@@ -89,7 +89,7 @@
                                        class="checkbox"
                                        value={% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}"{{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}"
 
-                                        {% if presented_reparation.status.id_status == statuses['REPARATION_EN_COURS'] %} checked="checked" {% endif %}
+                                        {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} checked="checked" {% endif %}
                                         {% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                                 >
                                 {{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}
@@ -124,7 +124,7 @@
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
-                            {{ 'Etat de la reparation:'|trans({}, 'Modules.Hsrdv.Admin') }}
+                            {{ 'Etat de la réparation:'|trans({}, 'Modules.Hsrdv.Admin') }}
                         </h3>
                         <div class="card-body">
                             <form action="{{ etat_reparation_form_action }}" method="POST" data-action="etatReparation">
@@ -135,9 +135,11 @@
                                         {% if presented_reparation.status.id_status >  statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                                 >
                             </form>
-                            <span class="step-date">
+                            {% if presented_reparation.date_reparation is not null %}
+                                <span class="step-date">
                                {{ 'Date reparation:'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ presented_reparation.date_reparation|date('d-m-Y')}}
                             </span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -169,20 +171,21 @@
                         <div class="card-body">
                             <form action="{{ etat_livraison_form_action }}" method="POST" data-action="etatLivraison">
                                     <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
-                                    <input name="submitFeedback"
+                                    <input name="submitFeedback" class="btn btn-primary"
                                            value="{{ 'Livré'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
-                                            {% if presented_reparation.status.id_status >=9 %} disabled {% endif %}
+                                            {% if presented_reparation.status.id_status >= statuses['LIVRE'] %} disabled {% endif %}
                                     >
                             </form>
+                            {% if presented_reparation.date_livraison is not null %}
                             <span class="step-date">
                                {{ 'Date livraison:'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ presented_reparation.date_livraison|date('d-m-Y')}}
                             </span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
         {% endif %}
-
     </div>
 </div>
 {% endblock %}
