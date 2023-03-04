@@ -1,76 +1,10 @@
-{% extends '@PrestaShop/Admin/layout.html.twig' %}
-{% trans_default_domain "Admin.Design.Feature" %}
+{#{% extends '@PrestaShop/Admin/layout.html.twig' %}
+{% trans_default_domain "Admin.Design.Feature" %}#}
 
 {% block content %}
 
 <div class="row">
     <div class="col-sm-12">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <h3 class="card-header">
-                        {{ 'Informations sur la reparation:'|trans({}, 'Modules.Hsrdv.Admin') }}
-                    </h3>
-                    <div class="card-body">
-                        <div class="date-demande">
-                            <span class="line-title">{{ 'Date Demande'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                            <span class="line-content">{{ presented_reparation.date_demande|date("m/d/Y H:i:s") }}</span>
-                        </div>
-                        <div class="status-reparation">
-                            <span class="line-title">{{ 'Status Réparation'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                            <span class="line-content" style="background-color: {{ presented_reparation.status.color }};">{{ presented_reparation.status.message }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                  <h3 class="card-header">
-                      {{ 'Informations sur le client:'|trans({}, 'Modules.Hsrdv.Admin') }}
-                  </h3>
-                  <div class="card-body">
-                      {% if presented_reparation.client is not empty %}
-                          <div class="commande-line">
-                              <span class="line-title">{{ 'Email Client'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                              <span class="line-content">{{ presented_reparation.client.email }}</span>
-                          </div>
-                      {% endif %}
-
-                      {% if presented_reparation.client.nom is not empty %}
-                          <div class="commande-line">
-                              <span class="line-title">{{ 'Nom Client'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                              <span class="line-content">{{ presented_reparation.client.nom }}</span>
-                          </div>
-                      {% endif %}
-
-                      {% if presented_reparation.client.prenom is not empty %}
-                          <div class="commande-line">
-                              <span class="line-title">{{ 'Prenom Client'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                              <span class="line-content">{{ presented_reparation.client.prenom }}</span>
-                          </div>
-                      {% endif %}
-
-                      {% if presented_reparation.client.phone is not empty %}
-                          <div class="commande-line">
-                              <span class="line-title">{{ 'Telephone Client'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                              <span class="line-content">{{ presented_reparation.client.phone }}</span>
-                          </div>
-                      {% endif %}
-
-                      {% if presented_reparation.client.addresse_postale is not empty %}
-                          <div class="commande-line">
-                              <span class="line-title">{{ 'Addresse Client'|trans({}, 'Modules.Hsrdv.Admin') }}:</span>
-                              <span class="line-content">{{ presented_reparation.client.addresse_postale }}</span>
-                          </div>
-                      {% endif %}
-                      </div>
-                </div>
-            </div>
-        </div>
-
         <div class="row mt-3">
             <div class="col">
                 <div class="card">
@@ -101,7 +35,7 @@
                                                          name="appareils[{{ appareil.id_appareil }}]"
                                                          value="{{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}"
                                                          {% if appareil.decision == true %}checked="checked"{% endif %}
-                                                         {% if presented_reparation.status.id_status != 1  %}disabled{% endif %}
+                                                         {% if presented_reparation.status.id_status != statuses['DEMANDE_REPARATION']  %}disabled{% endif %}
                                                   >
                                                   {{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}
                                               </label>
@@ -111,7 +45,7 @@
                                                          name="appareils[{{ appareil.id_appareil }}]"
                                                          value="{{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}"
                                                          {% if appareil.decision == false and not appareil.decision is same as(null) %}checked="checked"{% endif %}
-                                                         {% if presented_reparation.status.id_status != 1  %}disabled{% endif %}
+                                                         {% if presented_reparation.status.id_status != statuses['DEMANDE_REPARATION']  %}disabled{% endif %}
                                                   >
                                                   {{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}
                                               </label>
@@ -124,9 +58,10 @@
                                     <div class="submit-line">
                                         <span class="line-title">
                                             <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
-                                            <input class="" name="submitMessage"
+                                            <input type="hidden" name="id_order" value="{{ id_order }}" />
+                                            <input class="btn btn-primary" class="" name="submitMessage"
                                                    value="{{ 'Envoyer réponse'|trans({}, 'Modules.Hsrdv.Admin') }}"
-                                                   {% if presented_reparation.status.id_status  >= 2 %} disabled {% endif %}
+                                                   {% if presented_reparation.status.id_status  >= statuses['PRISE_RDV'] %} disabled {% endif %}
                                                    type="submit">
                                         </span>
                                     </div>
@@ -138,12 +73,12 @@
             </div>
         </div>
 
-        {% if presented_reparation.status.id_status >= 4  %}
+        {% if presented_reparation.status.id_status >= statuses['RDV_PRIS']  %}
         <div class="row">
             <div class="col">
                 <div class="card">
                     <h3 class="card-header">
-                        {{ 'Prise en charge:'|trans({}, 'Modules.Hsrdv.Admin') }}
+                        {{ 'Prise en charge'|trans({}, 'Modules.Hsrdv.Admin') }}
                     </h3>
                     <div class="card-body">
                         <form action="{{ prise_en_charge_decision_form_action }}" method="POST" data-action="priseEnChargeFeedback">
@@ -152,10 +87,10 @@
                                        id=""
                                        name="decision_prise_en_charge"
                                        class="checkbox"
-                                       value={% if presented_reparation.status.id_status  >= 5 %} disabled {% endif %}"{{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}"
+                                       value={% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}"{{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}"
 
-                                        {% if presented_reparation.status.id_status == 5 %} checked="checked" {% endif %}
-                                        {% if presented_reparation.status.id_status  >= 5 %} disabled {% endif %}
+                                        {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} checked="checked" {% endif %}
+                                        {% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                                 >
                                 {{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}
                             </label>
@@ -166,153 +101,17 @@
                                        name="decision_prise_en_charge"
                                        class="checkbox"
                                        value="{{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}"
-                                        {% if presented_reparation.status.id_status == 6 %} checked="checked" {% endif %}
-                                        {% if presented_reparation.status.id_status >= 5 %} disabled {% endif %}
+                                        {% if presented_reparation.status.id_status == statuses['NON_PRIS_EN_CHARGE'] %} checked="checked" {% endif %}
+                                        {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                                 >
                                 {{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}
                             </label>
                             <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
-                            <input name="submitFeedback"
+                            <input class="btn btn-primary" name="submitFeedback"
                                    value="{{ 'Valider'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
-                                    {% if presented_reparation.status.id_status >= 5 %} disabled {% endif %}
+                                    {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                             >
                         </form>
-                    </div>
-                    <div id="devis-form" class="card-body row"  {% if presented_reparation.status.id_status < 5 or presented_reparation.status.id_status == 6  %}style="display: none;" {% endif %}>
-                        <div class="col-md-9">
-                            <form action="{{ generation_devis_form_action }}" method="POST" data-action="generation-devis">
-                                <div id="LabelForAppareils">
-                                    {{ 'Détails devis:'|trans({}, 'Modules.Hsrdv.Admin') }}
-                                </div>
-                                <div>
-                                    <label for="" class="required">{{ 'Acompte'|trans({}, 'Modules.Hsrdv.Admin') }}
-                                    <input type="textarea" class="form-control" name="acompte" value="{% if presented_reparation.devis.acompte is defined %}{{ presented_reparation.devis.acompte }} {% endif %}" />
-                                    </label>
-                                </div>
-                                <div id="lignes-container" >
-                                    <div id="tab-content" >
-                                        <table id="devis-table" class="table">
-                                            <thead>
-                                            <tr>
-                                                <th>{{ 'Numéro'|trans({}, 'Modules.Hsrdv.Admin') }}</th>
-                                                <th>{{ 'Appareil'|trans({}, 'Modules.Hsrdv.Admin') }}</th>
-                                                <th>{{ 'Type Réparation'|trans({}, 'Modules.Hsrdv.Admin') }}</th>
-                                                <th>{{ 'Prix'|trans({}, 'Modules.Hsrdv.Admin') }}</th>
-                                                <th>{{ 'Supprimer'|trans({}, 'Modules.Hsrdv.Admin') }}</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% if presented_reparation.devis.devis_lignes is defined %}
-                                            {% for ligne in presented_reparation.devis.devis_lignes %}
-                                                {% set firstLoopIndex = loop.index - 1 %}
-{#                                                {{ dump(firstLoopIndex) }}#}
-                                                <tr class="form-group-line devis-line" id="form-element-{{ firstLoopIndex }}">
-                                                    <td>{{ loop.index }}</td>
-                                                    <td>
-                                                        {% for appareil in presented_reparation.appareils %}
-                                                            <div>
-                                                                <label>
-                                                                    <input type="radio" name="lines[{{ firstLoopIndex }}][appareil]"
-                                                                           value="{{ appareil.id_appareil }}"
-                                                                            {% if appareil.id_appareil == ligne.id_appareil  %} checked="checked" {% endif %}>
-                                                                        {{ appareil.marque }} {{ appareil.reference }}
-                                                                    </input>
-                                                                </label>
-                                                            </div>
-                                                        {% endfor %}
-                                                    </td>
-                                                    <td>
-                                                        <select class="custom-select" name="lines[{{ firstLoopIndex }}][id_type_reparation]">
-
-                                                            {% for type_reparation in types_reparation %}
-                                                                <option value="{{ type_reparation.id }}"
-                                                                {% if type_reparation.id == ligne.id_type_reparation %}selected{% endif %}
-                                                                >{{ type_reparation.name }}</option>
-                                                            {% endfor %}
-                                                            {# todo: selected #}
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <input
-                                                            class="form-control reference"
-                                                            name="lines[{{ firstLoopIndex }}][price]"
-                                                            type="text"
-                                                            value="{{ ligne.price }}"
-                                                        >
-                                                    </td>
-                                                    <td>
-                                                        <button id="remove-line-{{ firstLoopIndex }}" class="remove-line">X</button>
-                                                    </td>
-                                                </tr>
-                                            {% endfor %}
-                                            {% endif %}
-                                            <tr class="form-group-line devis-line dummy-devis-ligne" style="display: none;">
-                                                <td></td>
-                                                <td>
-                                                    {% for appareil in presented_reparation.appareils %}
-                                                        <div>
-                                                            <label>
-                                                                <input type="radio" name="dummyline[appareil]"
-                                                                       value="{{ appareil.id_appareil }}"/>
-                                                                    {{ appareil.marque }} {{ appareil.reference }}
-                                                            </label>
-                                                        </div>
-                                                    {% endfor %}
-                                                </td>
-                                                <td>
-                                                    <select class="custom-select" name="dummyline[id_type_reparation]">
-                                                        <option selected="selected"></option>
-                                                        {% for type_reparation in types_reparation %}
-                                                            <option value="{{ type_reparation.id }}">{{ type_reparation.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        class="form-control reference"
-                                                        name="dummyline[price]"
-                                                        type="text"
-                                                        value=""
-                                                    >
-                                                </td>
-                                                <td>
-                                                    <button id="remove-line-" class="remove-line">X</button>
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div id="addLineDevis">
-                                        <input class="{#btn btn-primary#}"
-                                               name="addSubForm"
-                                               data-button-action="addLine"
-                                               value="{{ 'Ajouter ligne'|trans({}, 'Modules.Hsrdv.Admin') }}"
-                                               type="button">
-                                    </div>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div id="remarques_specifiques">
-                                    <label for="" class="required">{{ 'Remarques Spécifiques'|trans({}, 'Modules.Hsrdv.Admin') }}</label>
-                                        <textarea class="form-control" name="remarques_specifiques">
-                                            {% if presented_reparation.devis.remarques_specifiques is defined %}{{ presented_reparation.devis.remarques_specifiques }} {% endif %}
-                                        </textarea>
-
-                                </div>
-                                <input type="hidden"  name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
-                                <input type="submit" class="btn btn-primary" name="submitFeedback"
-                                       value="{{ 'Enregistrer'|trans({}, 'Modules.Hsrdv.Admin') }}" {#type="submit"#}
-                                        {# {% if presented_reparation.status.id_status >= 5 %} disabled {% endif %}#}
-                                >
-                            </form>
-                        </div>
-                        <div class="col-md-3">
-                            <a class="btn btn-primary btn-large"
-                               target="_blank" rel="noopener noreferrer nofollow"
-                               href="{{ getAdminLink('AdminDevisGenPDF', true, {'submitAction': 'testSomeCode', 'id_reparation': 1}) }}"
-                            >
-                                {{ 'Generer Devis'|trans({}, 'Modules.Hsrdv.Admin') }}
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -320,25 +119,27 @@
         {% endif %}
 
 
-        {% if presented_reparation.status.id_status >= 5 and presented_reparation.status.id_status != 6  %}
+        {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] and presented_reparation.status.id_status != statuses['NON_PRIS_EN_CHARGE']  %}
             <div class="row">
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
-                            {{ 'Etat de la reparation:'|trans({}, 'Modules.Hsrdv.Admin') }}
+                            {{ 'Etat de la réparation'|trans({}, 'Modules.Hsrdv.Admin') }}
                         </h3>
                         <div class="card-body">
                             <form action="{{ etat_reparation_form_action }}" method="POST" data-action="etatReparation">
 
                                 <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
-                                <input name="submitFeedback"
+                                <input name="submitFeedback" class="btn btn-primary"
                                        value="{{ 'Réparé'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
-                                        {% if presented_reparation.status.id_status >=6 %} disabled {% endif %}
+                                        {% if presented_reparation.status.id_status >  statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                                 >
                             </form>
-                            <span class="step-date">
-                               {{ 'Date reparation:'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ presented_reparation.date_reparation|date('d-m-Y')}}
-                            </span>
+                            {% if presented_reparation.date_reparation is not null %}
+                                <span class="step-date">
+                                    {{ 'Date reparation:'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ presented_reparation.date_reparation|date('d-m-Y')}}
+                                </span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -346,14 +147,12 @@
         {% endif %}
 
 
-
-
-        {% if presented_reparation.status.id_status >= 8  %}
+        {% if presented_reparation.status.id_status >= statuses['A_LIVRER']  %}
             <div class="row">
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
-                            {{ 'Mode de livraison:'|trans({}, 'Modules.Hsrdv.Admin') }}
+                            {{ 'Mode de livraison'|trans({}, 'Modules.Hsrdv.Admin') }}
                         </h3>
                         <div class="card-body">
                             {% if presented_reparation.mode_livraison == 1 %}{{ 'Retrait Atelier'|trans({}, 'Modules.Hsrdv.Admin') }}{% endif %}
@@ -363,7 +162,7 @@
                 </div>
             </div>
 
-            <div class="row">
+           <div class="row">
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
@@ -372,26 +171,29 @@
                         <div class="card-body">
                             <form action="{{ etat_livraison_form_action }}" method="POST" data-action="etatLivraison">
                                     <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
-                                    <input name="submitFeedback"
+                                    <input name="submitFeedback" class="btn btn-primary"
                                            value="{{ 'Livré'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
-                                            {% if presented_reparation.status.id_status >=9 %} disabled {% endif %}
+                                            {% if presented_reparation.status.id_status >= statuses['LIVRE'] %} disabled {% endif %}
                                     >
                             </form>
+                            {% if presented_reparation.date_livraison is not null %}
                             <span class="step-date">
                                {{ 'Date livraison:'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ presented_reparation.date_livraison|date('d-m-Y')}}
                             </span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
         {% endif %}
-
     </div>
 </div>
 {% endblock %}
+{#
 
 {% block javascripts %}
     {{ parent() }}
 
     <script src="{{ asset('../modules/hsrdv/views/public/show.js') }}"></script>
 {% endblock %}
+#}

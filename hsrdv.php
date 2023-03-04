@@ -825,7 +825,7 @@ class Hsrdv extends Module implements WidgetInterface
             $typeReparationReparation = $entityManager->getRepository(TypeReparation::class);
             $typesReparation = $typeReparationReparation->findAll();
 
-            return $this->render('@Modules/hsrdv/views/templates/admin/reparation/initial_decision_form.html.twig', [
+            return $this->render('@Modules/hsrdv/views/templates/admin/reparation/show.html.twig', [
                 'id_order' => $params['id_order'],
                 'presented_reparation' => $presentedReparation,
                 'types_reparation' => $typesReparation,
