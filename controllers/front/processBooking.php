@@ -176,6 +176,8 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         $date = trim(Tools::getValue('date'));
 
         $reparationBookings = Booking::getBookingsFromIdReparation($idReparation);
+        $order = new Order((int)$idOrder);
+        $states = $this->getOrderStatuses();
 
         if(count($reparationBookings) > 0) {
             foreach ($reparationBookings as $booking) {
@@ -214,9 +216,8 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         }
 
         $reparation = new Reparation($idReparation);
-        $id_client = $reparation->id_client;
 
-        $customer = new Customer($id_client);
+        $customer = new Customer($order->id_customer);
         $customer->firstname = $prenom;
         $customer->lastname = $nom;
         //var_dump($customer);
@@ -245,8 +246,7 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         else {
             $address->add();
         }
-        $order = new Order((int)$idOrder);
-        $states = $this->getOrderStatuses();
+
         $order->current_state = $states['RDV_PRIS'];
         $order->update();
         if ($customer->update()) {

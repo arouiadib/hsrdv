@@ -88,8 +88,8 @@ class HsRdvTimeslotsModuleFrontController extends ModuleFrontController
 
         $reparation = Reparation::getReparationFromToken($reparationToken);
         $appareils = Appareil::getAppareilsFromIdReparation($reparation['id_reparation']);
-
-        $customer = new Customer((int)$reparation['id_client']);
+        $order = new Order((int)$reparation['id_order']);
+        $customer = new Customer($order->id_customer);
         $addressId = Address::getFirstCustomerAddressId($customer->id);
 
         if ($addressId) {

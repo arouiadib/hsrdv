@@ -234,7 +234,6 @@ class HsRdvProcessRdvInitialModuleFrontController extends ModuleFrontController 
                 }*/
 
         $order->id_carrier = 0;
-        $id_carrier = 0;
         $reference = Order::generateReference();
         $order->id_customer = (int)$id_customer;
         $order->id_address_invoice = 17/*(int)$this->context->cart->id_address_invoice*/;
@@ -254,8 +253,6 @@ class HsRdvProcessRdvInitialModuleFrontController extends ModuleFrontController 
         $order->total_products = 0;
         $order->total_products_wt = 0;
         $order->conversion_rate = $this->context->currency->conversion_rate;
-
-
 
         $id_new_order_state = false;
         $name_new_state = Hsrdv::STATUSES['DEMANDE_REPARATION']['title'];
@@ -361,25 +358,15 @@ class HsRdvProcessRdvInitialModuleFrontController extends ModuleFrontController 
          *
          */
 
-
-
-
-
-
-
-
-
-
         // todo: if excisting customer, update newsletter
         $reparation = new Reparation();
-
         $reparation->id_order = $order->id;
-        $reparation->id_status = $this->module ::DEMANDE_REPARATION;
-        $reparation->id_client = $id_customer;
         $reparation->token = Tools::passwdGen(12);
 
-        $timeNow = new DateTime();
-        $reparation->date_demande = $timeNow->format('Y-m-d H:i:s');;
+
+        $reparation->date_reparation = null;
+        $reparation->date_livraison = null;
+
         if(!$reparation->add()) {
             $this->context->controller->errors[] = $this->trans(
                 'An error occurred while creating reparation record',

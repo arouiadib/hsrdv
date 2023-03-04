@@ -173,7 +173,7 @@ class ReparationController extends FrameworkBundleAdminController
         ]);
     }
 
-    public function initialDecisionBisAction(Request $request)
+    public function initialDecisionAction(Request $request)
     {
         if(isset($request->request))
         {
@@ -221,8 +221,7 @@ class ReparationController extends FrameworkBundleAdminController
             $appareilRepository = $entityManager->getRepository(Appareil::class);
             $reparation = $reparationRepository->find($idReparation);
 
-            $id_customer = $reparation->getIdClient();
-            $customer = new Customer((int)$id_customer);
+            $customer = new Customer((int)$order->id_customer);
 
             if (!$customer)
             {
@@ -414,9 +413,10 @@ class ReparationController extends FrameworkBundleAdminController
             $appareilRepository = $entityManager->getRepository(Appareil::class);
 
             $reparation = $reparationRepository->find((int)$request->request->get('id_reparation'));
+            $idOrder = $reparation->getIdOrder();
+            $order = new Order((int)$idOrder);
 
-            $id_client = $reparation->getIdClient();
-            $customer = new Customer((int)$id_client);
+            $customer = new Customer((int)$order->id_customer);
             $from = $customer->email;
 
             $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId()]);
@@ -435,9 +435,6 @@ class ReparationController extends FrameworkBundleAdminController
                 '{email}' =>  $from,
                 '{liste_appareils}' => $appareilsListString,
             ];
-
-            $idOrder = $reparation->getIdOrder();
-            $order = new Order((int)$idOrder);
 
             $states = $this->getOrderStatuses();
 
@@ -514,8 +511,10 @@ class ReparationController extends FrameworkBundleAdminController
             $reparation = $reparationRepository->find((int)$request->request->get('id_reparation'));
             $reparation->setDateReparation(new \DateTime());
 
-            $id_client = $reparation->getIdClient();
-            $customer = new Customer((int)$id_client);
+            $idOrder = $reparation->getIdOrder();
+            $order = new Order((int)$idOrder);
+
+            $customer = new Customer((int)$order->id_customer);
             $from = $customer->email;
 
             $reparationToken = $reparation->getToken();
@@ -532,9 +531,6 @@ class ReparationController extends FrameworkBundleAdminController
                     $appareilsListString = $appareilsListString . ', ';
                 }
             }
-
-            $idOrder = $reparation->getIdOrder();
-            $order = new Order((int)$idOrder);
 
             $states = $this->getOrderStatuses();
             $order->current_state = $states['REPARE'];

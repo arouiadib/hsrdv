@@ -22,7 +22,7 @@ class Reparation extends \ObjectModel
     /**
      * @var \DateTime
      */
-    public $date_demande;
+    public $date_reparation;
 
     /**
      * @var int
@@ -49,8 +49,7 @@ class Reparation extends \ObjectModel
         'fields' => array(
             'id_reparation' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt'),
             'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt'),
-            'date_demande' => array('type' => self::TYPE_DATE),
-            'date_reparation' => array('type' => self::TYPE_DATE),
+            'date_reparation' => array('type' => self::TYPE_DATE, 'validate' => 'isDateOrNull'),
             'mode_livraison' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt'),
             'date_livraison' => array('type' => self::TYPE_DATE),
             'token' => array('type' => self::TYPE_STRING),
@@ -101,7 +100,7 @@ class Reparation extends \ObjectModel
 
     public static function getReparationFromToken($token)
     {
-        $sql = 'SELECT r.id_reparation, r.`id_client`, r.`id_order`  FROM ' . _DB_PREFIX_ . 'hsrdv_reparation r WHERE r.token = "'.$token. '"';
+        $sql = 'SELECT r.id_reparation, r.`id_order`  FROM ' . _DB_PREFIX_ . 'hsrdv_reparation r WHERE r.token = "'.$token. '"';
 
         return Db::getInstance()->getRow($sql);
     }

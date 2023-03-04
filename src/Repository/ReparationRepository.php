@@ -69,9 +69,9 @@ class ReparationRepository
             "CREATE TABLE IF NOT EXISTS `{$this->dbPrefix}hsrdv_reparation`(
     			`id_reparation` int(10) unsigned NOT NULL auto_increment,
     			`id_order` int(10) unsigned NOT NULL,
-    			`date_reparation` datetime,
+    			`date_reparation` datetime default NULL,
     			`mode_livraison` int,
-    			`date_livraison` datetime,
+    			`date_livraison` datetime default NULL,
     	        `token` varchar(70) NOT NULL default '',
     			PRIMARY KEY (`id_reparation`)
             ) ENGINE=$engine DEFAULT CHARSET=utf8",

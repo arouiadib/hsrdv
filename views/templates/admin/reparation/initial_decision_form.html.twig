@@ -78,7 +78,7 @@
             <div class="col">
                 <div class="card">
                     <h3 class="card-header">
-                        {{ 'Prise en charge:'|trans({}, 'Modules.Hsrdv.Admin') }}
+                        {{ 'Prise en charge'|trans({}, 'Modules.Hsrdv.Admin') }}
                     </h3>
                     <div class="card-body">
                         <form action="{{ prise_en_charge_decision_form_action }}" method="POST" data-action="priseEnChargeFeedback">
@@ -124,7 +124,7 @@
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
-                            {{ 'Etat de la réparation:'|trans({}, 'Modules.Hsrdv.Admin') }}
+                            {{ 'Etat de la réparation'|trans({}, 'Modules.Hsrdv.Admin') }}
                         </h3>
                         <div class="card-body">
                             <form action="{{ etat_reparation_form_action }}" method="POST" data-action="etatReparation">
@@ -137,8 +137,8 @@
                             </form>
                             {% if presented_reparation.date_reparation is not null %}
                                 <span class="step-date">
-                               {{ 'Date reparation:'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ presented_reparation.date_reparation|date('d-m-Y')}}
-                            </span>
+                                    {{ 'Date reparation:'|trans({}, 'Modules.Hsrdv.Admin') }} : {{ presented_reparation.date_reparation|date('d-m-Y')}}
+                                </span>
                             {% endif %}
                         </div>
                     </div>
@@ -152,7 +152,7 @@
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
-                            {{ 'Mode de livraison:'|trans({}, 'Modules.Hsrdv.Admin') }}
+                            {{ 'Mode de livraison'|trans({}, 'Modules.Hsrdv.Admin') }}
                         </h3>
                         <div class="card-body">
                             {% if presented_reparation.mode_livraison == 1 %}{{ 'Retrait Atelier'|trans({}, 'Modules.Hsrdv.Admin') }}{% endif %}
