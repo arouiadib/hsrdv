@@ -68,14 +68,11 @@ class ReparationRepository
         $queries = [
             "CREATE TABLE IF NOT EXISTS `{$this->dbPrefix}hsrdv_reparation`(
     			`id_reparation` int(10) unsigned NOT NULL auto_increment,
-    			`id_status` int(10) unsigned NOT NULL,
-    			`id_client` int(10) unsigned NOT NULL,
-    			`date_demande` datetime,
+    			`id_order` int(10) unsigned NOT NULL,
     			`date_reparation` datetime,
     			`mode_livraison` int,
     			`date_livraison` datetime,
     	        `token` varchar(70) NOT NULL default '',
-    	        `id_order` int(10) unsigned NOT NULL,
     			PRIMARY KEY (`id_reparation`)
             ) ENGINE=$engine DEFAULT CHARSET=utf8",
             "CREATE TABLE IF NOT EXISTS `{$this->dbPrefix}hsrdv_client`(
