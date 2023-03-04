@@ -17,17 +17,7 @@ class Reparation extends \ObjectModel
     /**
      * @var int
      */
-    public $id_status;
-
-    /**
-     * @var int
-     */
-    public $id_client;
-
-    /**
-     * @var \DateTime
-     */
-    public $date_reparation;
+    public $id_order;
 
     /**
      * @var \DateTime
@@ -50,11 +40,6 @@ class Reparation extends \ObjectModel
     public $token;
 
     /**
-     * @var int
-     */
-    public $id_order;
-
-    /**
      * @see ObjectModel::$definition
      */
     public static $definition = array(
@@ -63,14 +48,12 @@ class Reparation extends \ObjectModel
         'multilang' => false,
         'fields' => array(
             'id_reparation' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt'),
-            'id_status' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt'),
-            'id_client' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt'),
+            'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt'),
             'date_demande' => array('type' => self::TYPE_DATE),
             'date_reparation' => array('type' => self::TYPE_DATE),
             'mode_livraison' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt'),
             'date_livraison' => array('type' => self::TYPE_DATE),
             'token' => array('type' => self::TYPE_STRING),
-            'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt'),
         ),
     );
 
@@ -98,9 +81,7 @@ class Reparation extends \ObjectModel
     {
         return [
             'id_reparation' => $this->id_reparation,
-            'id_status' => $this->id_status,
-            'id_client' => $this->id_client,
-            'date_demande' => $this->date_demande,
+            'id_order' => $this->id_order,
             'date_reparation' => $this->date_reparation,
             'mode_livraison' => $this->mode_livraison,
             'date_livraison' => $this->date_livraison
@@ -125,14 +106,6 @@ class Reparation extends \ObjectModel
         return Db::getInstance()->getRow($sql);
     }
 
-/*    public static function getReparationFromIdReparation($id_order)
-    {
-        $sql = 'SELECT r.*  FROM ' . _DB_PREFIX_ . 'hsrdv_reparation r WHERE r.id_order = "'.$id_order. '"';
-
-        return Db::getInstance()->getRow($sql);
-    }*/
-
-
     public static function getReparationsForEnqueteSatisfaction($interval = 10)
     {
         $sql = 'SELECT r.id_reparation, c.`id_customer`, r.`token`  
@@ -154,8 +127,6 @@ class Reparation extends \ObjectModel
         return Db::getInstance()->executeS($sql);
     }
 
-
 //*/1 * * * * /usr/bin/php /var/www/html/hsdev/modules/hsrdv/cronSendMailsRappelRendezVous.php
 //*/1 * * * * /usr/bin/php /var/www/html/hsdev/modules/hsrdv/cronSendMailsRappelEnqueteSatisfaction.php
-
 }
