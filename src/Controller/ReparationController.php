@@ -430,27 +430,23 @@ class ReparationController extends FrameworkBundleAdminController
             $order = new Order((int)$orderId);
             $appareils = !is_null($request->request->get('appareils')) ? $request->request->get('appareils') : [];
 
-           /* if (count($appareils) == 0)
-            {
-                $this->addFlash('error', $this->getErrorMessageForException($e, $this->getErrorMessages($e)));
-                return new JsonResponse(array(
-                    'status' => 'Error',
-                    'message' => 'No decision taken'),
-                    400);
-            }*/
 
             $idReparation = (int)$request->request->get('id_reparation');
             $entityManager = $this->container->get('doctrine.orm.entity_manager');
             $appareilRepository = $entityManager->getRepository(Appareil::class);
             $appareilsDb = $appareilRepository->findBy(['id_reparation'=> $idReparation]);
 
-/*            if (count($appareils) != count($appareilsDb))
+            if (count($appareils) != count($appareilsDb) || count($appareils) == 0 )
             {
-                return new JsonResponse(array(
-                    'status' => 'Error',
-                    'message' => 'Missing appareil decision'),
-                    400);
-            }*/
+                $this->addFlash(
+                    'error',
+                    'Error: check if you forgot to make decision, or number of decisions invalid'
+                );
+
+                return $this->redirectToRoute('admin_orders_view', [
+                    'orderId' => $orderId,
+                ]);
+            }
             // Persist appareils decisions
             foreach ($appareilsDb as $key => $appareilDb) {
                 foreach ($appareils as $k => $appareilDecision) {
@@ -658,14 +654,6 @@ class ReparationController extends FrameworkBundleAdminController
     }
     public function priseEnChargeDecisionAction(Request $request)
     {
-
-/*        if (!$request->isXmlHttpRequest()) {
-            return new JsonResponse(array(
-                'status' => 'Error',
-                'message' => 'Error'),
-                400);
-        }*/
-
         if(isset($request->request))
         {
             $decision_prise_en_charge = $request->request->get('decision_prise_en_charge');
@@ -763,108 +751,11 @@ class ReparationController extends FrameworkBundleAdminController
             return $this->redirectToRoute('admin_orders_view', [
                 'orderId' => $idOrder,
             ]);
-
-           /* return new JsonResponse(array(
-                    'status' => 'OK',
-                    'rdv_status' => $rdvStatus,
-                    'prise_en_charge' => $decision_prise_en_charge === 'Oui' ? 1 : 0,
-                    'message' => []
-                ),
-                200);*/
         }
-
-        return new JsonResponse(array(
-            'status' => 'Error',
-            'message' => 'Error'),
-            400);
-
-    }
-
-    public function genererDevisAction(Request $request)
-    {
-
-        if (!$request->isXmlHttpRequest()) {
-            return new JsonResponse(array(
-                'status' => 'Error',
-                'message' => 'Error'),
-                400);
-        }
-
-        if(isset($request->request))
-        {
-
-            $entityManager = $this->container->get('doctrine.orm.entity_manager');
-            $acompte = (int)$request->request->get('acompte');
-            $remarques_specifiques = trim($request->request->get('remarques_specifiques'));
-            $id_reparation = $request->request->get('id_reparation');
-            $lines =  $request->request->get('lines');
-            $lines = isset($lines) ? $lines : [];
-            $reparationRepository = $entityManager->getRepository(Reparation::class);
-            $reparation = $reparationRepository->find((int)$request->request->get('id_reparation'));
-
-            $devisRepository = $entityManager->getRepository(Devis::class);
-            $devis = $devisRepository->findOneBy(['id_reparation'=> $id_reparation]);
-
-            if (!$devis) {
-                $devis = new Devis();
-
-            }
-
-            $devis->setIdReparation($id_reparation);
-            $devis->setAcompte($acompte);
-            $devis->setRemarquesSpecifiques(trim($remarques_specifiques));
-            $entityManager->persist($devis);
-
-            // if no devis, new devis
-            /*var_dump($devis); die;*/
-            $devisLigneRepository = $entityManager->getRepository(DevisLigne::class);
-            $devisLignes = $devisLigneRepository->findBy(['id_devis'=> $devis->getId()]);
-
-/*            echo "<pre>";
-            var_dump($devisLignes);*/
-            foreach ($devisLignes as $ligne) {
-                $entityManager->remove($ligne);
-            }
-            $entityManager->flush();
-            $devisLignes = $devisLigneRepository->findBy(['id_devis'=> $devis->getId()]);
-            //var_dump($devisLignes); die;
-
-            foreach ($lines as $line) {
-                $ligneDevis = new DevisLigne();
-                $ligneDevis->setPrice($line['price']);
-                $ligneDevis->setIdAppareil($line['appareil']);
-                $ligneDevis->setIdTypeReparation($line['id_type_reparation']);
-                $ligneDevis->setIdDevis($devis->getId());
-
-                $typeReparationRepository = $entityManager->getRepository(TypeReparation::class);
-                $typeReparation = $typeReparationRepository->findOneBy(['id' => $line['id_type_reparation']]);
-                $ligneDevis->setNameTypeReparation($typeReparation->getName());
-                $entityManager->persist($ligneDevis);
-                $entityManager->flush();
-            }
-
-            //$entityManager->flush();
-            // Persist Form data
-            // Send mail + pdf joint
-            // Download pdf
-
-            return new JsonResponse(array(
-                'status' => 'OK',
-               /* 'rdv_status' => $rdvStatus,*/
-                'message' => []),
-                200);
-        }
-
-        return new JsonResponse(array(
-            'status' => 'Error',
-            'message' => 'Error'),
-            400);
-
     }
 
     public function etatReparationAction(Request $request)
     {
-
         if(isset($request->request))
         {
             $entityManager = $this->container->get('doctrine.orm.entity_manager');
@@ -980,6 +871,89 @@ class ReparationController extends FrameworkBundleAdminController
             return new JsonResponse(array(
                 'status' => 'OK',
                 'rdv_status' => $rdvStatus,
+                'message' => []),
+                200);
+        }
+
+        return new JsonResponse(array(
+            'status' => 'Error',
+            'message' => 'Error'),
+            400);
+
+    }
+
+
+    public function genererDevisAction(Request $request)
+    {
+
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse(array(
+                'status' => 'Error',
+                'message' => 'Error'),
+                400);
+        }
+
+        if(isset($request->request))
+        {
+
+            $entityManager = $this->container->get('doctrine.orm.entity_manager');
+            $acompte = (int)$request->request->get('acompte');
+            $remarques_specifiques = trim($request->request->get('remarques_specifiques'));
+            $id_reparation = $request->request->get('id_reparation');
+            $lines =  $request->request->get('lines');
+            $lines = isset($lines) ? $lines : [];
+            $reparationRepository = $entityManager->getRepository(Reparation::class);
+            $reparation = $reparationRepository->find((int)$request->request->get('id_reparation'));
+
+            $devisRepository = $entityManager->getRepository(Devis::class);
+            $devis = $devisRepository->findOneBy(['id_reparation'=> $id_reparation]);
+
+            if (!$devis) {
+                $devis = new Devis();
+
+            }
+
+            $devis->setIdReparation($id_reparation);
+            $devis->setAcompte($acompte);
+            $devis->setRemarquesSpecifiques(trim($remarques_specifiques));
+            $entityManager->persist($devis);
+
+            // if no devis, new devis
+            /*var_dump($devis); die;*/
+            $devisLigneRepository = $entityManager->getRepository(DevisLigne::class);
+            $devisLignes = $devisLigneRepository->findBy(['id_devis'=> $devis->getId()]);
+
+            /*            echo "<pre>";
+                        var_dump($devisLignes);*/
+            foreach ($devisLignes as $ligne) {
+                $entityManager->remove($ligne);
+            }
+            $entityManager->flush();
+            $devisLignes = $devisLigneRepository->findBy(['id_devis'=> $devis->getId()]);
+            //var_dump($devisLignes); die;
+
+            foreach ($lines as $line) {
+                $ligneDevis = new DevisLigne();
+                $ligneDevis->setPrice($line['price']);
+                $ligneDevis->setIdAppareil($line['appareil']);
+                $ligneDevis->setIdTypeReparation($line['id_type_reparation']);
+                $ligneDevis->setIdDevis($devis->getId());
+
+                $typeReparationRepository = $entityManager->getRepository(TypeReparation::class);
+                $typeReparation = $typeReparationRepository->findOneBy(['id' => $line['id_type_reparation']]);
+                $ligneDevis->setNameTypeReparation($typeReparation->getName());
+                $entityManager->persist($ligneDevis);
+                $entityManager->flush();
+            }
+
+            //$entityManager->flush();
+            // Persist Form data
+            // Send mail + pdf joint
+            // Download pdf
+
+            return new JsonResponse(array(
+                'status' => 'OK',
+                /* 'rdv_status' => $rdvStatus,*/
                 'message' => []),
                 200);
         }
