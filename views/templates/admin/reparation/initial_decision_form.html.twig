@@ -59,7 +59,7 @@
                                         <span class="line-title">
                                             <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
                                             <input type="hidden" name="id_order" value="{{ id_order }}" />
-                                            <input class="" name="submitMessage"
+                                            <input class="btn btn-primary" class="" name="submitMessage"
                                                    value="{{ 'Envoyer réponse'|trans({}, 'Modules.Hsrdv.Admin') }}"
                                                    {% if presented_reparation.status.id_status  >= statuses['PRISE_RDV'] %} disabled {% endif %}
                                                    type="submit">

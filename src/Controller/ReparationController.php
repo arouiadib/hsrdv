@@ -865,26 +865,16 @@ class ReparationController extends FrameworkBundleAdminController
     public function etatReparationAction(Request $request)
     {
 
-        if (!$request->isXmlHttpRequest()) {
-            return new JsonResponse(array(
-                'status' => 'Error',
-                'message' => 'Error'),
-                400);
-        }
-
         if(isset($request->request))
         {
-
             $entityManager = $this->container->get('doctrine.orm.entity_manager');
             $reparationRepository = $entityManager->getRepository(Reparation::class);
-            $statusRepository = $entityManager->getRepository(Status::class);
             $appareilRepository = $entityManager->getRepository(Appareil::class);
 
             $reparation = $reparationRepository->find((int)$request->request->get('id_reparation'));
 
             $reparation->setIdStatus(\Hsrdv::REPARE);
             $reparation->setDateReparation(new \DateTime());
-            $status = $statusRepository->findOneBy(['id'=> \Hsrdv::REPARE]);
 
             $id_client = $reparation->getIdClient();
             $customer = new Customer((int)$id_client);
@@ -904,6 +894,11 @@ class ReparationController extends FrameworkBundleAdminController
                     $appareilsListString = $appareilsListString . ', ';
                 }
             }
+
+            $idOrder = $reparation->getIdOrder();
+            $order = new Order((int)$idOrder);
+
+            $states = $this->getOrderStatuses();
 
 
             $var_list = [
@@ -941,19 +936,7 @@ class ReparationController extends FrameworkBundleAdminController
 
             $entityManager->persist($reparation);
             $entityManager->flush();
-
-            $rdvStatus = [
-                'message' => $status->getMessage(),
-                'color' => $status->getColor()
-            ];
-
-            return new JsonResponse(
-                                array(
-                                    'status' => 'OK',
-                                    'rdv_status' => $rdvStatus,
-                                    'message' => []
-                                ),
-                                200);
+            $order->update();
         }
 
         return new JsonResponse(array(
