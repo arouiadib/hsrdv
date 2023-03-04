@@ -810,7 +810,6 @@ class Hsrdv extends Module implements WidgetInterface
             }*/
 
             $presentedReparation['id_reparation'] = $reparation->getId();
-            $presentedReparation['date_demande'] = $reparation->getDateDemande();
             $presentedReparation['mode_livraison'] = $reparation->getModeLivraison();
             $presentedReparation['date_reparation'] = $reparation->getDateReparation();
             $presentedReparation['date_livraison'] = $reparation->getDateLivraison();
@@ -831,7 +830,7 @@ class Hsrdv extends Module implements WidgetInterface
                 'presented_reparation' => $presentedReparation,
                 'types_reparation' => $typesReparation,
                 'statuses' => $finalStatuses,
-                'initial_decision_form_action' => $this->get('router')->generate('admin_rdv_reparation_inital_decision_bis'),
+                'initial_decision_form_action' => $this->get('router')->generate('admin_rdv_reparation_inital_decision'),
                 'prise_en_charge_decision_form_action' => $this->get('router')->generate('admin_rdv_reparation_prise_en_charge_decision'),
                 'etat_reparation_form_action' => $this->get('router')->generate('admin_rdv_reparation_etat_reparation'),
                 'etat_livraison_form_action' => $this->get('router')->generate('admin_rdv_reparation_etat_livraison'),
