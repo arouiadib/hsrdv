@@ -46,12 +46,15 @@ class HsRdvProcessLivraisonModuleFrontController extends ModuleFrontController {
             }
         }
 
+        $reparation = new Reparation((int)Tools::getValue('id_reparation'));
+        $idOrder = $reparation->id_order;
 
         return [
             'livraison_form_action_link' => $rdvFormAction = $this->context->link->getModuleLink('hsrdv', 'processLivraison'),
             'notifications2' => $notifications2,
             'reparationToken' => Tools::getValue('reparationToken'),
             'id_reparation' => Tools::getValue('id_reparation'),
+            'id_order' => $idOrder
         ];
     }
 
@@ -82,16 +85,18 @@ class HsRdvProcessLivraisonModuleFrontController extends ModuleFrontController {
     private function updateReparationModeLivraison() {
 
         $idReparation = (int) Tools::getValue('id_reparation');
-
         $reparation = new Reparation($idReparation);
-
-
+        $idOrder = $reparation->id_order;
+        $order = new Order($idOrder);
+        $states = $this->getOrderStatuses();
         if ($reparation->id_reparation) {
             //var_dump(Tools::getValue('mode_livraison'));die;
             $reparation->id_status = $this->module :: A_LIVRER;
+            $order->current_state = $states['A_LIVRER'];
             $reparation->mode_livraison = Tools::getValue('mode_livraison');
             //var_dump($reparation->mode_livraison);die;
             $reparation->update();
+            $order->update();
 
 
         } else {
@@ -101,5 +106,22 @@ class HsRdvProcessLivraisonModuleFrontController extends ModuleFrontController {
                 'Modules.Hsrdv.Shop'
             );
         }
+    }
+
+    private function getOrderStatuses() {
+        $finalStatuses = [];
+        $statuses = Hsrdv::STATUSES;
+        $dbStatuses = OrderState::getOrderStates($this->context->language->id);
+
+        foreach ($dbStatuses as $dbStatus) {
+            foreach ($statuses as $key => $status) {
+                if ($status['title'] == $dbStatus['name'] ) {
+                    $finalStatuses[$key] = (int)$dbStatus['id_order_state'];
+                }
+            }
+
+        }
+
+        return $finalStatuses;
     }
 }

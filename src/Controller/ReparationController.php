@@ -790,7 +790,7 @@ class ReparationController extends FrameworkBundleAdminController
             $order = new Order((int)$idOrder);
 
             $states = $this->getOrderStatuses();
-
+            $order->current_state = $states['REPARE'];
 
             $var_list = [
                 '{email}' =>  $from,
@@ -828,13 +828,11 @@ class ReparationController extends FrameworkBundleAdminController
             $entityManager->persist($reparation);
             $entityManager->flush();
             $order->update();
+
+            return $this->redirectToRoute('admin_orders_view', [
+                'orderId' => $idOrder,
+            ]);
         }
-
-        return new JsonResponse(array(
-            'status' => 'Error',
-            'message' => 'Error'),
-            400);
-
     }
 
 
@@ -881,7 +879,7 @@ class ReparationController extends FrameworkBundleAdminController
             400);
 
     }
-    
+
     /**
      * @param Request $request
      *

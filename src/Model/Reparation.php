@@ -125,12 +125,14 @@ class Reparation extends \ObjectModel
         return Db::getInstance()->getRow($sql);
     }
 
-    public static function getReparationFromIdOrder($id_order)
+/*    public static function getReparationFromIdReparation($id_order)
     {
         $sql = 'SELECT r.*  FROM ' . _DB_PREFIX_ . 'hsrdv_reparation r WHERE r.id_order = "'.$id_order. '"';
 
         return Db::getInstance()->getRow($sql);
-    }
+    }*/
+
+
     public static function getReparationsForEnqueteSatisfaction($interval = 10)
     {
         $sql = 'SELECT r.id_reparation, c.`id_customer`, r.`token`  
