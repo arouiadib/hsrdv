@@ -130,9 +130,9 @@
                             <form action="{{ etat_reparation_form_action }}" method="POST" data-action="etatReparation">
 
                                 <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
-                                <input name="submitFeedback"
+                                <input name="submitFeedback" class="btn btn-primary"
                                        value="{{ 'Réparé'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
-                                        {% if presented_reparation.status.id_status >=6 %} disabled {% endif %}
+                                        {% if presented_reparation.status.id_status >  statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                                 >
                             </form>
                             <span class="step-date">
@@ -145,10 +145,8 @@
         {% endif %}
 
 
-
-
-        {% if presented_reparation.status.id_status >= 8  %}
-{#            <div class="row">
+        {% if presented_reparation.status.id_status >= statuses['A_LIVRER']  %}
+            <div class="row">
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
@@ -160,9 +158,9 @@
                         </div>
                     </div>
                 </div>
-            </div>#}
+            </div>
 
-{#            <div class="row">
+           <div class="row">
                 <div class="col">
                     <div class="card">
                         <h3 class="card-header">
@@ -182,7 +180,7 @@
                         </div>
                     </div>
                 </div>
-            </div>#}
+            </div>
         {% endif %}
 
     </div>
