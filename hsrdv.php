@@ -12,9 +12,6 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
 
-use PrestaShop\Module\HsRdv\Entity\Devis;
-use PrestaShop\Module\HsRdv\Entity\DevisLigne;
-use PrestaShop\Module\HsRdv\Entity\Status;
 use PrestaShop\Module\HsRdv\Entity\TypeReparation;
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\PrestaShop\Adapter\LegacyContext;
@@ -28,17 +25,6 @@ use PrestaShop\Module\HsRdv\Model\Booking;
 
 class Hsrdv extends Module implements WidgetInterface
 {
-    const DEMANDE_REPARATION = 1;
-    const PRISE_RDV = 2;
-    const RDV_REFUSE = 3;
-    const RDV_PRIS = 4;
-    const REPARATION_EN_COURS = 5;
-    const NON_PRIS_EN_CHARGE = 6;
-    const REPARE = 7;
-    const A_LIVRER = 8;
-    const LIVRE = 9;
-    const ENQUETE = 10;
-
     const STATUSES = [
         'DEMANDE_REPARATION' => [ 'title' => 'Demande de réparation', 'color' => '#faff0b'],
         'PRISE_RDV' => [ 'title' => 'Prise de rendez-vous', 'color' => '#24ff23'],
@@ -337,32 +323,13 @@ class Hsrdv extends Module implements WidgetInterface
 
     private function installTabs()
     {
-        $mainTabId = (int)Tab::getIdFromClassName('HsRdvAdmin');
-        if (!$mainTabId) {
-            $mainTabId = null;
-        }
-
-        $mainTab = new Tab($mainTabId);
-        $mainTab->active = 1;
-        $mainTab->class_name = 'HsRdvAdmin';
-        $mainTab->name = array();
-
-        foreach (Language::getLanguages(true) as $lang) {
-            $mainTab->name[$lang['id_lang']] = $this->trans('Rendez-vous', array(), 'Modules.Hsrdv.Admin', $lang['locale']);
-        }
-
-        $mainTab->id_parent = 0;
-        $mainTab->module = $this->name;
-
-        $return = $mainTab->save();
-        $mainTabId = $mainTab->id;
-
+        $return = true;
         $tabs = $this->getHsRdvTabs();
-
+        $parentTabID = Tab::getIdFromClassName('AdminParentOrders');
         foreach ($tabs as $tab) {
             $subTab = new Tab();
             $subTab->class_name = $tab['class_name'];
-            $subTab->id_parent = $mainTabId;
+            $subTab->id_parent = $parentTabID;
             $subTab->module = $this->name;
             $subTab->route_name = $tab['route_name'];
             foreach (Language::getLanguages(true) as $lang) {
@@ -378,12 +345,6 @@ class Hsrdv extends Module implements WidgetInterface
     {
         $return = true;
 
-        $mainTabId = (int)Tab::getIdFromClassName('HsRdvAdmin');
-        if ($mainTabId) {
-            $mainTab = new Tab($mainTabId);
-            $return &= $mainTab->delete();
-        }
-
         $tabs = $this->getHsRdvTabs();
         foreach ($tabs as $tab) {
             $subTabId = (int)Tab::getIdFromClassName($tab['class_name']);
@@ -398,16 +359,13 @@ class Hsrdv extends Module implements WidgetInterface
     {
         return [
             [
-                'class_name' => 'HsRdvReparationController',
-                'name' => 'Réparations',
-                'route_name' => 'admin_rdv_reparation_list'
-            ],
-            [
+                'parent_class_name' => 'AdminParentOrders ',
                 'class_name' => 'HsRdvCalendarController',
                 'name' => 'Calendrier',
                 'route_name' => 'admin_rdv_calendar'
             ],
             [
+                'parent_class_name' => 'AdminParentOrders ',
                 'class_name' => 'HsRdvTypeReparationController',
                 'name' => 'Types Réparation',
                 'route_name' => 'admin_type_reparation_list'
@@ -429,6 +387,7 @@ class Hsrdv extends Module implements WidgetInterface
     public function hookActionAdminControllerSetMedia($params)
     {
         $this->context->controller->addCSS($this->_path . 'views/css/back.css', 'all');
+        $this->context->controller->addJS($this->_path . 'views/public/order.js', 'all');
 
     }
 
@@ -656,7 +615,6 @@ class Hsrdv extends Module implements WidgetInterface
 
             setlocale(LC_ALL, $localeOfContextLanguage . '.UTF-8', $localeOfContextLanguage);
             $dateFormatted = strftime("%d %B %Y", strtotime($booking[0]['date_booking']));
-
 
             $var_list = [
                 '{nom}' => $customer->lastname,
