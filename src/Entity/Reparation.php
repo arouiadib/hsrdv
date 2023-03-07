@@ -57,6 +57,12 @@ class Reparation
      */
     private $token;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="devis", type="string")
+     */
+    private $devis;
 
     /**
      * @return int
@@ -154,6 +160,21 @@ class Reparation
         $this->token = $token;
     }
 
+    /**
+     * @return string
+     */
+    public function getDevis()
+    {
+        return $this->devis;
+    }
+
+    /**
+     * @param string $devis
+     */
+    public function setDevis($devis)
+    {
+        $this->devis = $devis;
+    }
     /**
      * @return array
      */

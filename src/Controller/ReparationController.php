@@ -26,6 +26,7 @@ use Order;
 use Hsrdv;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use PrestaShop\Module\HsRdv\Calendar\Calendar;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
  * Class ReparationController.
@@ -402,7 +403,7 @@ class ReparationController extends FrameworkBundleAdminController
             400);
 
     }
-    public function priseEnChargeDecisionAction(Request $request)
+    public function priseEnChargeDecisionAction(Request $request, SluggerInterface $slugger)
     {
         if(isset($request->request))
         {
@@ -498,34 +499,25 @@ class ReparationController extends FrameworkBundleAdminController
                 return new Response("No file specified",
                     Response::HTTP_UNPROCESSABLE_ENTITY, ['content-type' => 'text/plain']);
             }
-            $uploadDir = '/download/';
-            $filename = $file->getClientOriginalName();
-           /* $uploader = $this->get('prestashop.module.hsrdv.file_uploader');
-            $uploader->upload($uploadDir, $file, $filename);*/
 
-            /*$originalFilename = pathinfo($filename, PATHINFO_FILENAME);
-            // this is needed to safely include the file name as part of the URL
-            $safeFilename = $slugger->slug($originalFilename);
-            $newFilename = $safeFilename.'-'.uniqid().'.'.$brochureFile->guessExtension();*/
+            if ($file) {
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
 
-            try {
-                $file->move(
-                    _PS_DOWNLOAD_DIR_,
-                    $filename
-                );
-            } catch (FileException $e) {
-                // ... handle exception if something happens during file upload
+                // Move the file to the directory where brochures are stored
+                try {
+                    $file->move(
+                        _PS_DOWNLOAD_DIR_,
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                $reparation->setDevis($newFilename);
             }
-
-/*            return new Response("File uploaded",  Response::HTTP_OK,
-                ['content-type' => 'text/plain']);
-
-
-
-*/
-
-
-
 
             $entityManager->persist($reparation);
             $entityManager->flush();
