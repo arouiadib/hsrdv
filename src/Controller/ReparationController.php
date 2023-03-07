@@ -22,7 +22,6 @@ use OrderState;
 use Order;
 use Hsrdv;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
  * Class ReparationController.
@@ -399,7 +398,7 @@ class ReparationController extends FrameworkBundleAdminController
             400);
 
     }
-    public function priseEnChargeDecisionAction(Request $request, SluggerInterface $slugger)
+    public function priseEnChargeDecisionAction(Request $request)
     {
         if(isset($request->request))
         {
@@ -457,6 +456,51 @@ class ReparationController extends FrameworkBundleAdminController
                     null
                 );
 
+
+
+                $file = $request->files->get('myfile');
+
+                if (empty($file))
+                {
+                    $this->addFlash(
+                        'error',
+                        'Error: No file specified'
+                    );
+
+                    return $this->redirectToRoute('admin_orders_view', [
+                        'orderId' => $idOrder,
+                    ]);
+                }
+
+                if ($file) {
+                    $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                    // this is needed to safely include the file name as part of the URL
+                    //$safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $idOrder . '-' . uniqid() . '-' . $originalFilename .  '.' . $file->guessExtension();
+
+                    // Move the file to the directory where brochures are stored
+                    try {
+                        $file->move(
+                            _PS_DOWNLOAD_DIR_,
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                        $this->addFlash(
+                            'error',
+                            'Error: Cannot upload file, please retry!'
+                        );
+
+                        return $this->redirectToRoute('admin_orders_view', [
+                            'orderId' => $idOrder,
+                        ]);
+                    }
+
+                    $reparation->setDevis($newFilename);
+                }
+
+                $entityManager->persist($reparation);
+                $entityManager->flush();
+
             } else {
                 $order->current_state = $states['NON_PRIS_EN_CHARGE'];
                 $sent = Mail::Send(
@@ -479,45 +523,20 @@ class ReparationController extends FrameworkBundleAdminController
                 );
             }
 
+            $order->update();
+
             if (!$sent)
             {
-                return new JsonResponse(array(
-                    'status' => 'Error',
-                    'message' => 'Mail not successfuly sent'),
-                    400);
+                $this->addFlash(
+                    'error',
+                    'Error: Mail not successfuly sent!'
+                );
+
+                return $this->redirectToRoute('admin_orders_view', [
+                    'orderId' => $idOrder,
+                ]);
             }
 
-
-            $file = $request->files->get('myfile');
-
-            if (empty($file))
-            {
-                return new Response("No file specified",
-                    Response::HTTP_UNPROCESSABLE_ENTITY, ['content-type' => 'text/plain']);
-            }
-
-            if ($file) {
-                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
-
-                // Move the file to the directory where brochures are stored
-                try {
-                    $file->move(
-                        _PS_DOWNLOAD_DIR_,
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // ... handle exception if something happens during file upload
-                }
-
-                $reparation->setDevis($newFilename);
-            }
-
-            $entityManager->persist($reparation);
-            $entityManager->flush();
-            $order->update();
 
             return $this->redirectToRoute('admin_orders_view', [
                 'orderId' => $idOrder,

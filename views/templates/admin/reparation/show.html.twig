@@ -88,9 +88,11 @@
                                            id=""
                                            name="decision_prise_en_charge"
                                            class="checkbox"
-                                           value={% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}"{{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}"
-
-                                    {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} checked="checked" {% endif %}
+                                           selected="selected"
+                                           value={% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %}
+                                           disabled
+                                           {% endif %}"{{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}"
+                                    {% if presented_reparation.status.id_status >= statuses['RDV_PRIS'] and presented_reparation.status.id_status != statuses['NON_PRIS_EN_CHARGE']  %} checked="checked" {% endif %}
                                     {% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                                     >
                                     {{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}
@@ -112,16 +114,28 @@
                             <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
 
                             <div class="custom-file" {% if presented_reparation.status.id_status == statuses['NON_PRIS_EN_CHARGE'] %}style="display:none;"{% endif %}>
-                                <input class="custom-file-input form-control-file" type="file" name="myfile" id="myfile">
+                                <input class="custom-file-input form-control-file"
+                                       type="file"
+                                       name="myfile"
+                                       id="myfile"
+                                        {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
+                                >
                                 <label class="custom-file-label" for="myfile">{{ 'Choisir le pdf du devis'|trans({}, 'Modules.Hsrdv.Admin') }}</label>
                             </div>
 
-
                             <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
-                            <input class="btn btn-primary" name="submitFeedback"
-                                   value="{{ 'Valider'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
-                                    {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
-                            >
+                            <div class="" id="">
+                                <input class="btn btn-primary" name="submitFeedback"
+                                       value="{{ 'Valider'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
+                                        {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] or presented_reparation.status.id_status == statuses['NON_PRIS_EN_CHARGE'] %} disabled {% endif %}
+                                >
+                            </div>
+                            <div class="" id="">
+                                {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] and presented_reparation.status.id_status != statuses['NON_PRIS_EN_CHARGE'] %}
+                                    <a href="" class="btn btn-primary"
+                                    >{{ 'Télécharger Devis'|trans({}, 'Modules.Hsrdv.Admin') }}</a>
+                                {% endif %}
+                            </div>
                         </form>
                     </div>
                 </div>
