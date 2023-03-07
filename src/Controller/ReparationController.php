@@ -398,6 +398,7 @@ class ReparationController extends FrameworkBundleAdminController
             400);
 
     }
+
     public function priseEnChargeDecisionAction(Request $request)
     {
         if(isset($request->request))
@@ -433,32 +434,11 @@ class ReparationController extends FrameworkBundleAdminController
             ];
 
             $states = $this->getOrderStatuses();
+            $file = $request->files->get('myfile');
 
             if  ($decision_prise_en_charge === 'Oui') {
                 // Email Non
                 $order->current_state = $states['REPARATION_EN_COURS'];
-                $sent = Mail::Send(
-                    $this->getContext()->language->id,
-                    'hsrdv_reparation_en_cours',
-                    $this->trans('La réparation est en cours',
-                        'Modules.Hsrdv.Shop'),
-                    $var_list,
-                    $from,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    _PS_MAIL_DIR_,
-                    false,
-                    null,
-                    null,
-                    null
-                );
-
-
-
-                $file = $request->files->get('myfile');
 
                 if (empty($file))
                 {
@@ -474,17 +454,18 @@ class ReparationController extends FrameworkBundleAdminController
 
                 if ($file) {
                     $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                    // this is needed to safely include the file name as part of the URL
                     //$safeFilename = $slugger->slug($originalFilename);
                     $newFilename = $idOrder . '-' . uniqid() . '-' . $originalFilename .  '.' . $file->guessExtension();
-
-                    // Move the file to the directory where brochures are stored
                     try {
                         $file->move(
                             _PS_DOWNLOAD_DIR_,
                             $newFilename
                         );
+                        //var_dump("hi");die;
+
+
                     } catch (FileException $e) {
+                        dd($e);
                         $this->addFlash(
                             'error',
                             'Error: Cannot upload file, please retry!'
@@ -495,11 +476,13 @@ class ReparationController extends FrameworkBundleAdminController
                         ]);
                     }
 
+
                     $reparation->setDevis($newFilename);
                 }
 
                 $entityManager->persist($reparation);
                 $entityManager->flush();
+
 
             } else {
                 $order->current_state = $states['NON_PRIS_EN_CHARGE'];
@@ -521,9 +504,84 @@ class ReparationController extends FrameworkBundleAdminController
                     null,
                     null
                 );
+                if (!$sent)
+                {
+                    $this->addFlash(
+                        'error',
+                        'Error: Mail not successfuly sent!'
+                    );
+
+                    return $this->redirectToRoute('admin_orders_view', [
+                        'orderId' => $idOrder,
+                    ]);
+                }
+            }
+            $order->update();
+
+            return $this->redirectToRoute('admin_orders_view', [
+                'orderId' => $idOrder,
+            ]);
+        }
+    }
+
+    public function priseEnChargeMailAction(Request $request)
+    {
+        if(isset($request->request))
+        {
+            $entityManager = $this->container->get('doctrine.orm.entity_manager');
+            $reparationRepository = $entityManager->getRepository(Reparation::class);
+            $appareilRepository = $entityManager->getRepository(Appareil::class);
+
+            $reparation = $reparationRepository->find((int)$request->request->get('id_reparation'));
+            $idOrder = $reparation->getIdOrder();
+            $order = new Order((int)$idOrder);
+
+            $customer = new Customer((int)$order->id_customer);
+            $from = $customer->email;
+
+            $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId()]);
+            $appareilsListString = '';
+            $lastAppareilKey = array_key_last($appareils);
+            foreach ($appareils as $key => $appareil) {
+                $appareilsListString = $appareilsListString . $appareil->getMarque() . ' ' . $appareil->getReference();
+                if ($lastAppareilKey != $key)
+                {
+                    $appareilsListString = $appareilsListString . ', ';
+                }
             }
 
-            $order->update();
+            //todo: Only liste appareils oui
+            $var_list = [
+                '{email}' =>  $from,
+                '{liste_appareils}' => $appareilsListString,
+            ];
+
+            $file_attachment = [];
+            $filename = $reparation->getDevis();
+            $content = file_get_contents(_PS_DOWNLOAD_DIR_. $filename);
+            $file_attachment['content'] = $content;
+            $file_attachment['name'] ='RandomPDF';
+            $file_attachment['mime'] = 'application/pdf';
+
+            $sent = Mail::Send(
+                        $this->getContext()->language->id,
+                        'hsrdv_reparation_en_cours',
+                        $this->trans('La réparation est en cours',
+                            'Modules.Hsrdv.Shop'),
+                        $var_list,
+                        $from,
+                        null,
+                        null,
+                        null,
+                        $file_attachment,
+                        null,
+                        _PS_MAIL_DIR_,
+                        false,
+                        null,
+                        null,
+                        null
+                    );
+
 
             if (!$sent)
             {

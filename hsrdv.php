@@ -786,6 +786,7 @@ class Hsrdv extends Module implements WidgetInterface
                 'statuses' => $finalStatuses,
                 'initial_decision_form_action' => $this->get('router')->generate('admin_rdv_reparation_inital_decision'),
                 'prise_en_charge_decision_form_action' => $this->get('router')->generate('admin_rdv_reparation_prise_en_charge_decision'),
+                'prise_en_charge_mail_form_action' => $this->get('router')->generate('admin_rdv_reparation_prise_en_charge_mail'),
                 'etat_reparation_form_action' => $this->get('router')->generate('admin_rdv_reparation_etat_reparation'),
                 'etat_livraison_form_action' => $this->get('router')->generate('admin_rdv_reparation_etat_livraison'),
                 'generation_devis_form_action' => $this->get('router')->generate('admin_rdv_reparation_generer_devis')

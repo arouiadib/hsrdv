@@ -80,63 +80,79 @@
                     <h3 class="card-header">
                         {{ 'Prise en charge'|trans({}, 'Modules.Hsrdv.Admin') }}
                     </h3>
-                    <div class="card-body">
-                        <form action="{{ prise_en_charge_decision_form_action }}" method="POST" data-action="priseEnChargeFeedback" enctype="multipart/form-data">
-                            <div>
-                                <label for="" class="required">
-                                    <input type="radio"
-                                           id=""
-                                           name="decision_prise_en_charge"
-                                           class="checkbox"
-                                           selected="selected"
-                                           value={% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %}
-                                           disabled
-                                           {% endif %}"{{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}"
-                                    {% if presented_reparation.status.id_status >= statuses['RDV_PRIS'] and presented_reparation.status.id_status != statuses['NON_PRIS_EN_CHARGE']  %} checked="checked" {% endif %}
-                                    {% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
-                                    >
-                                    {{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}
-                                </label>
+                    <div class="card-body row">
+                        <div class="col-md-6">
+                            <form action="{{ prise_en_charge_decision_form_action }}" method="POST" data-action="priseEnChargeFeedback" enctype="multipart/form-data">
+                                <div>
+                                    <label for="" class="required">
+                                        <input type="radio"
+                                               id=""
+                                               name="decision_prise_en_charge"
+                                               class="checkbox"
+                                               selected="selected"
+                                               value={% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %}
+                                               disabled
+                                        {% endif %}"{{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}"
+                                        {% if presented_reparation.status.id_status >= statuses['RDV_PRIS'] and presented_reparation.status.id_status != statuses['NON_PRIS_EN_CHARGE']  %} checked="checked" {% endif %}
+                                        {% if presented_reparation.status.id_status  >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
+                                        >
+                                        {{ 'Oui'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                    </label>
 
-                                <label for="" class="required">
-                                    <input type="radio"
-                                           id=""
-                                           name="decision_prise_en_charge"
-                                           class="checkbox"
-                                           value="{{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}"
-                                            {% if presented_reparation.status.id_status == statuses['NON_PRIS_EN_CHARGE'] %} checked="checked" {% endif %}
+                                    <label for="" class="required">
+                                        <input type="radio"
+                                               id=""
+                                               name="decision_prise_en_charge"
+                                               class="checkbox"
+                                               value="{{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}"
+                                                {% if presented_reparation.status.id_status == statuses['NON_PRIS_EN_CHARGE'] %} checked="checked" {% endif %}
+                                                {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
+                                        >
+                                        {{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}
+                                    </label>
+                                </div>
+
+                                <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
+
+                                <div class="custom-file" {% if presented_reparation.status.id_status == statuses['NON_PRIS_EN_CHARGE'] %}style="display:none;"{% endif %}>
+                                    <input class="custom-file-input form-control-file"
+                                           type="file"
+                                           name="myfile"
+                                           id="myfile"
                                             {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
                                     >
-                                    {{ 'Non'|trans({}, 'Modules.Hsrdv.Admin') }}
-                                </label>
-                            </div>
+                                    <label class="custom-file-label" for="myfile">{{ 'Choisir le pdf du devis'|trans({}, 'Modules.Hsrdv.Admin') }}</label>
+                                </div>
 
-                            <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
+                                <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
+                                <div class="" id="">
+                                    <input class="btn btn-primary" name="submitFeedback"
+                                           value="{{ 'Valider'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
+                                            {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] or presented_reparation.status.id_status == statuses['NON_PRIS_EN_CHARGE'] %} disabled {% endif %}
+                                    >
+                                </div>
 
-                            <div class="custom-file" {% if presented_reparation.status.id_status == statuses['NON_PRIS_EN_CHARGE'] %}style="display:none;"{% endif %}>
-                                <input class="custom-file-input form-control-file"
-                                       type="file"
-                                       name="myfile"
-                                       id="myfile"
-                                        {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] %} disabled {% endif %}
-                                >
-                                <label class="custom-file-label" for="myfile">{{ 'Choisir le pdf du devis'|trans({}, 'Modules.Hsrdv.Admin') }}</label>
-                            </div>
 
-                            <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
-                            <div class="" id="">
-                                <input class="btn btn-primary" name="submitFeedback"
-                                       value="{{ 'Valider'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
-                                        {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] or presented_reparation.status.id_status == statuses['NON_PRIS_EN_CHARGE'] %} disabled {% endif %}
-                                >
-                            </div>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form action="{{ prise_en_charge_mail_form_action }}" method="POST">
+                                <div class="" id="">
+                                    <input type="hidden" name="id_reparation" value="{{ presented_reparation.id_reparation }}" />
+                                    {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] and presented_reparation.status.id_status != statuses['NON_PRIS_EN_CHARGE'] %}
+                                        <input class="btn btn-primary" name="submitFeedback"
+                                               value="{{ 'Envoyer Mail + Devis'|trans({}, 'Modules.Hsrdv.Admin') }}" type="submit"
+                                        >
+                                    {% endif %}
+                                </div>
+                            </form>
                             <div class="" id="">
                                 {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] and presented_reparation.status.id_status != statuses['NON_PRIS_EN_CHARGE'] %}
                                     <a href="" class="btn btn-primary"
                                     >{{ 'Télécharger Devis'|trans({}, 'Modules.Hsrdv.Admin') }}</a>
                                 {% endif %}
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
