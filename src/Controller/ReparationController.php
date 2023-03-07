@@ -490,6 +490,43 @@ class ReparationController extends FrameworkBundleAdminController
                     400);
             }
 
+
+            $file = $request->files->get('myfile');
+
+            if (empty($file))
+            {
+                return new Response("No file specified",
+                    Response::HTTP_UNPROCESSABLE_ENTITY, ['content-type' => 'text/plain']);
+            }
+            $uploadDir = '/download/';
+            $filename = $file->getClientOriginalName();
+           /* $uploader = $this->get('prestashop.module.hsrdv.file_uploader');
+            $uploader->upload($uploadDir, $file, $filename);*/
+
+            /*$originalFilename = pathinfo($filename, PATHINFO_FILENAME);
+            // this is needed to safely include the file name as part of the URL
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename.'-'.uniqid().'.'.$brochureFile->guessExtension();*/
+
+            try {
+                $file->move(
+                    _PS_DOWNLOAD_DIR_,
+                    $filename
+                );
+            } catch (FileException $e) {
+                // ... handle exception if something happens during file upload
+            }
+
+/*            return new Response("File uploaded",  Response::HTTP_OK,
+                ['content-type' => 'text/plain']);
+
+
+
+*/
+
+
+
+
             $entityManager->persist($reparation);
             $entityManager->flush();
             $order->update();

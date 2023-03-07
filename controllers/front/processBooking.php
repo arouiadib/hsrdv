@@ -215,8 +215,6 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
             $booking->add();
         }
 
-        $reparation = new Reparation($idReparation);
-
         $customer = new Customer($order->id_customer);
         $customer->firstname = $prenom;
         $customer->lastname = $nom;
@@ -250,9 +248,6 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         $order->current_state = $states['RDV_PRIS'];
         $order->update();
         if ($customer->update()) {
-
-            $reparation->id_status = $this->module :: RDV_PRIS;
-            $reparation->update();
             $appareilsListString = '';
 
             $lastAppareilKey = array_key_last($appareils);

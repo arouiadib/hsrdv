@@ -107,6 +107,27 @@ class Hsrdv extends Module implements WidgetInterface
         return false;
     }
 
+    public function hookActionAdminControllerSetMedia($params)
+    {
+        $this->context->controller->addCSS($this->_path . 'views/css/back.css', 'all');
+        $this->context->controller->addJS($this->_path . 'views/js/BOorder.js', 'all');
+    }
+
+
+    public function hookActionFrontControllerSetMedia()
+    {
+
+    }
+
+    public function hookDisplayHeader()
+    {
+
+    }
+
+    public function hookModuleRoutes($params)
+    {
+        return $this->getModuleRoutes('ModuleRoutes', 'reparation');
+    }
 
     public function installDatabase()
     {
@@ -384,28 +405,6 @@ class Hsrdv extends Module implements WidgetInterface
 
     }
 
-    public function hookActionAdminControllerSetMedia($params)
-    {
-        $this->context->controller->addCSS($this->_path . 'views/css/back.css', 'all');
-        $this->context->controller->addJS($this->_path . 'views/public/order.js', 'all');
-
-    }
-
-
-    public function hookActionFrontControllerSetMedia()
-    {
-
-    }
-
-    public function hookDisplayHeader()
-    {
-
-    }
-
-    public function hookModuleRoutes($params)
-    {
-        return $this->getModuleRoutes('ModuleRoutes', 'reparation');
-    }
 
     public function getModuleRoutes($ModuleRoutes, $alias)
     {
