@@ -76,15 +76,6 @@ class ReparationRepository
     	        `devis` varchar(70) default NULL ,
     			PRIMARY KEY (`id_reparation`)
             ) ENGINE=$engine DEFAULT CHARSET=utf8",
-            "CREATE TABLE IF NOT EXISTS `{$this->dbPrefix}hsrdv_client`(
-    			`id_client` int(10) unsigned NOT NULL auto_increment,
-    			`nom` varchar(70) NOT NULL default '',
-    			`prenom` varchar(70) NOT NULL default '',
-    			`email` varchar(70) NOT NULL default '',
-    			`phone` varchar(70) NOT NULL default '',
-    			`addresse_postale` varchar(512) NOT NULL default '',
-    			PRIMARY KEY (`id_client`)
-            ) ENGINE=$engine DEFAULT CHARSET=utf8",
             "CREATE TABLE IF NOT EXISTS `{$this->dbPrefix}hsrdv_appareil`(
     			`id_appareil` int(10) unsigned NOT NULL auto_increment,
     			`marque` varchar(70) NOT NULL default '',
@@ -96,13 +87,6 @@ class ReparationRepository
     			`remarques_specifique` text default NULL,
     			`decision` boolean default NULL,
     			PRIMARY KEY (`id_appareil`)
-            ) ENGINE=$engine DEFAULT CHARSET=utf8",
-            "CREATE TABLE IF NOT EXISTS `{$this->dbPrefix}hsrdv_status`(
-    			`id_status` int(10) unsigned NOT NULL auto_increment,
-    			`code` varchar(128) NOT NULL default '',
-    			`message` varchar(70) NOT NULL default '',
-    			`color` varchar(20) NOT NULL default '',
-    			PRIMARY KEY (`id_status`)
             ) ENGINE=$engine DEFAULT CHARSET=utf8",
             "CREATE TABLE IF NOT EXISTS `{$this->dbPrefix}hsrdv_booking`(
     			`id_booking` int(10) unsigned NOT NULL auto_increment,
@@ -123,24 +107,7 @@ class ReparationRepository
                 `id_type_reparation` int(10) unsigned NOT NULL auto_increment,
                 `name` varchar(256) NOT NULL default '',
                 PRIMARY KEY (`id_type_reparation`)
-            )ENGINE=$engine  DEFAULT CHARSET=utf8;",
-            "CREATE TABLE IF NOT EXISTS `{$this->dbPrefix}hsrdv_devis` (
-                `id_devis` int(10) unsigned NOT NULL auto_increment,
-                `id_reparation` int(10) unsigned NOT NULL,
-                `acompte` int(10) unsigned NOT NULL,
-                `remarques_specifiques` text default NULL,
-                PRIMARY KEY (`id_devis`)
-            )ENGINE=$engine  DEFAULT CHARSET=utf8;",
-            "CREATE TABLE IF NOT EXISTS `{$this->dbPrefix}hsrdv_devis_ligne` (
-                `id_devis_ligne` int(10) unsigned NOT NULL auto_increment,
-                `id_devis` int(10) unsigned NOT NULL,
-                `price` int(10) unsigned NOT NULL,
-                `id_type_reparation` int(10) unsigned,
-                `id_appareil` int(10) unsigned,
-                `name_type_reparation` varchar(256) NOT NULL default '',
-                PRIMARY KEY (`id_devis_ligne`)
             )ENGINE=$engine  DEFAULT CHARSET=utf8;"
-
         ];
 
         foreach ($queries as $query) {
@@ -165,16 +132,7 @@ class ReparationRepository
     public function dropTables()
     {
         $errors = [];
-        $tableNames = [
-/*            'hsrdv_reparation',
-            'hsrdv_client',
-            'hsrdv_appareil',*/
-            'hsrdv_status',
-/*            'hsrdv_type_reparation',
-            'hsrdv_booking_exception',
-            'hsrdv_booking'*/
-
-        ];
+        $tableNames = [];
         foreach ($tableNames as $tableName) {
             $sql = 'DROP TABLE IF EXISTS ' . $this->dbPrefix . $tableName;
             $statement = $this->connection->executeQuery($sql);
