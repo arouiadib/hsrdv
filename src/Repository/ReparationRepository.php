@@ -7,7 +7,6 @@ use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
 use PrestaShop\PrestaShop\Core\Exception\DatabaseException;
 use Symfony\Component\Translation\TranslatorInterface;
-use Context;
 
 /**
  * Class ReparationRepository

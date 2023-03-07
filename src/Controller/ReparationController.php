@@ -12,20 +12,16 @@ use PrestaShop\Module\HsRdv\Core\Search\Filters\ReparationFilters;
 use PrestaShop\Module\HsRdv\Entity\Reparation;
 use PrestaShop\Module\HsRdv\Entity\Status;
 use PrestaShop\Module\HsRdv\Entity\Appareil;
-//todo remove client
-use PrestaShop\Module\HsRdv\Entity\Client;
 use PrestaShop\Module\HsRdv\Entity\Devis;
 use PrestaShop\Module\HsRdv\Entity\DevisLigne;
 use PrestaShop\Module\HsRdv\Entity\TypeReparation;
 use Hrdv;
 use Mail;
-use DateTime;
 use Customer;
 use OrderState;
 use Order;
 use Hsrdv;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use PrestaShop\Module\HsRdv\Calendar\Calendar;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
