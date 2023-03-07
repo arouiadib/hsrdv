@@ -165,36 +165,4 @@ class ReparationRepository
 
         return $statement;
     }
-
-    public function installFixtures()
-    {
-
-
-        $errors = [];
-        $sqlInsertStatuses = "INSERT INTO `{$this->dbPrefix}hsrdv_status` (`id_status`, `code`, `message`, `color`)
-                               VALUES (1 , 'DEMANDE_REPARATION', 'Demande de réparation', 'yellow'),
-                                        (2 , 'PRISE_RDV', 'Prise de rendez-vous', 'lime'), 
-                                        (3 , 'RDV_REFUSE', 'Rendez-vous refusé', 'tomato'),
-                                        (4 , 'RDV_PRIS', 'Rendez-vous pris', 'yellowgreen'),
-                                        (5 , 'REPARATION_EN_COURS', 'Réparation en cours', 'steelblue'),
-                                        (6 , 'NON_PRIS_EN_CHARGE ', 'Non pris en charge', 'red'),
-                                        (7 , 'REPARE', 'Réparé', 'green'),
-                                        (8 , 'A_LIVRER', 'A Livrer', 'grey'),
-                                        (9 , 'LIVRE', 'Livré', 'blue'),
-                                        (10 , 'ENQUETE', 'Enquête de satisfaction', 'purple')
-                               ;";
-
-        $statement = $this->connection->executeQuery($sqlInsertStatuses);
-        if ($statement instanceof Statement && 0 != (int) $statement->errorCode()) {
-            $errors[] = [
-                'key' => json_encode($statement->errorInfo()),
-                'parameters' => [],
-                'domain' => 'Admin.Modules.Notification',
-            ];
-        }
-
-        return $errors;
-    }
-
-
 }

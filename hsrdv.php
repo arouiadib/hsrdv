@@ -133,10 +133,7 @@ class Hsrdv extends Module implements WidgetInterface
     {
         $installed = true;
 
-        $errorsCreation = $this->reparationRepository->createTables();
-        $errorsFixtures = $this->reparationRepository->installFixtures();
-
-        $errors = array_merge($errorsCreation, $errorsFixtures);
+        $errors= $this->reparationRepository->createTables();
         if (!empty($errors)) {
             $this->addModuleErrors($errors);
             $installed = false;
