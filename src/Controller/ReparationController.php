@@ -416,7 +416,7 @@ class ReparationController extends FrameworkBundleAdminController
             $customer = new Customer((int)$order->id_customer);
             $from = $customer->email;
 
-            $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId()]);
+            $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId(), 'decision' => true]);
             $appareilsListString = '';
             $lastAppareilKey = array_key_last($appareils);
             foreach ($appareils as $key => $appareil) {
@@ -427,7 +427,6 @@ class ReparationController extends FrameworkBundleAdminController
                 }
             }
 
-            //todo: Only liste appareils oui
             $var_list = [
                 '{email}' =>  $from,
                 '{liste_appareils}' => $appareilsListString,
@@ -458,7 +457,7 @@ class ReparationController extends FrameworkBundleAdminController
                     $newFilename = $idOrder . '-' . uniqid() . '-' . $originalFilename .  '.' . $file->guessExtension();
                     try {
                         $file->move(
-                            _PS_DOWNLOAD_DIR_,
+                            _PS_UPLOAD_DIR_,
                             $newFilename
                         );
                         //var_dump("hi");die;
@@ -539,7 +538,7 @@ class ReparationController extends FrameworkBundleAdminController
             $customer = new Customer((int)$order->id_customer);
             $from = $customer->email;
 
-            $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId()]);
+            $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId(), 'decision' => true]);
             $appareilsListString = '';
             $lastAppareilKey = array_key_last($appareils);
             foreach ($appareils as $key => $appareil) {
@@ -550,7 +549,6 @@ class ReparationController extends FrameworkBundleAdminController
                 }
             }
 
-            //todo: Only liste appareils oui
             $var_list = [
                 '{email}' =>  $from,
                 '{liste_appareils}' => $appareilsListString,
@@ -558,9 +556,9 @@ class ReparationController extends FrameworkBundleAdminController
 
             $file_attachment = [];
             $filename = $reparation->getDevis();
-            $content = file_get_contents(_PS_DOWNLOAD_DIR_. $filename);
+            $content = file_get_contents(_PS_UPLOAD_DIR_. $filename);
             $file_attachment['content'] = $content;
-            $file_attachment['name'] ='RandomPDF';
+            $file_attachment['name'] = 'Devis-' . $idOrder;
             $file_attachment['mime'] = 'application/pdf';
 
             $sent = Mail::Send(
@@ -582,7 +580,6 @@ class ReparationController extends FrameworkBundleAdminController
                         null
                     );
 
-
             if (!$sent)
             {
                 $this->addFlash(
@@ -594,7 +591,6 @@ class ReparationController extends FrameworkBundleAdminController
                     'orderId' => $idOrder,
                 ]);
             }
-
 
             return $this->redirectToRoute('admin_orders_view', [
                 'orderId' => $idOrder,
@@ -622,7 +618,7 @@ class ReparationController extends FrameworkBundleAdminController
             $reparationToken = $reparation->getToken();
             $linkInMail = $this->getContext()->link->getModuleLink('hsrdv', 'livraison'). '?reparationToken=' . $reparationToken;
 
-            $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId()]);
+            $appareils = $appareilRepository->findBy(['id_reparation'=> $reparation->getId(), 'decision' => true]);
             $appareilsListString = '';
 
             $lastAppareilKey = array_key_last($appareils);
@@ -683,7 +679,6 @@ class ReparationController extends FrameworkBundleAdminController
 
     public function etatLivraisonAction(Request $request)
     {
-
         if(isset($request->request))
         {
             $entityManager = $this->container->get('doctrine.orm.entity_manager');
@@ -707,7 +702,6 @@ class ReparationController extends FrameworkBundleAdminController
                 'orderId' => $idOrder,
             ]);
         }
-
     }
 
     /**

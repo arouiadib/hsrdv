@@ -146,12 +146,12 @@
                                     {% endif %}
                                 </div>
                             </form>
-                            <div class="" id="">
+                            {#<div class="" id="">
                                 {% if presented_reparation.status.id_status >= statuses['REPARATION_EN_COURS'] and presented_reparation.status.id_status != statuses['NON_PRIS_EN_CHARGE'] %}
-                                    <a href="" class="btn btn-primary"
+                                    <a target="_blank" rel="noopener noreferrer nofollow" href="{{ presented_reparation.link_devis }}" class="btn btn-primary"
                                     >{{ 'Télécharger Devis'|trans({}, 'Modules.Hsrdv.Admin') }}</a>
                                 {% endif %}
-                            </div>
+                            </div>#}
                         </div>
                     </div>
                 </div>

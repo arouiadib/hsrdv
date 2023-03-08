@@ -90,11 +90,8 @@ class HsRdvProcessLivraisonModuleFrontController extends ModuleFrontController {
         $order = new Order($idOrder);
         $states = $this->getOrderStatuses();
         if ($reparation->id_reparation) {
-            //var_dump(Tools::getValue('mode_livraison'));die;
-            $reparation->id_status = $this->module :: A_LIVRER;
             $order->current_state = $states['A_LIVRER'];
             $reparation->mode_livraison = Tools::getValue('mode_livraison');
-            //var_dump($reparation->mode_livraison);die;
             $reparation->update();
             $order->update();
 

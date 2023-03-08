@@ -200,7 +200,7 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         $booking->id_reparation = $idReparation;
         $booking->add();
 
-        $appareils = Appareil::getAppareilsFromIdReparation($idReparation);
+        $appareils = Appareil::getAcceptedAppareilsFromIdReparation($idReparation);
         $countAppareils = count($appareils);
 
         if ($countAppareils > 2) {
@@ -218,9 +218,8 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         $customer = new Customer($order->id_customer);
         $customer->firstname = $prenom;
         $customer->lastname = $nom;
-        //var_dump($customer);
         $addressId = Address::getFirstCustomerAddressId($customer->id);
-        //var_dump($addressId);die;
+
         if ($addressId) {
             $address = new Address($addressId);
         }
@@ -259,15 +258,13 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
                 }
             }
 
-            //echo $datetime->format('l');
             $langLocale = $this->context->language->locale;
             $explodeLocale = explode('-', $langLocale);
             $localeOfContextLanguage = $explodeLocale[0].'_'.Tools::strtoupper($explodeLocale[1]);
 
             setlocale(LC_ALL, $localeOfContextLanguage.'.UTF-8', $localeOfContextLanguage);
             $dateFormatted = strftime("%d %B %Y", strtotime( $date));
-
-
+            
             $var_list = [
                 '{date}' =>  $dateFormatted,
                 '{liste_appareils}' => $appareilsListString,
@@ -276,7 +273,6 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
                 '{heure}' => $time
 
             ];
-            //todo: Rappeler seulement les appareils acceptés
 
             if($customer->email){
                 $sent= Mail::Send(

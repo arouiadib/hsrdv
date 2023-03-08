@@ -109,4 +109,14 @@ class Appareil extends \ObjectModel
 
         return Db::getInstance()->executeS($sql);
     }
+
+    public static function getAcceptedAppareilsFromIdReparation($id_reparation)
+    {
+        $sql = 'SELECT a.`marque`, a.`reference`
+                FROM `' . _DB_PREFIX_ . 'hsrdv_appareil` a
+                WHERE a.id_reparation=' . (int)$id_reparation .'
+                AND a.decision = true';
+
+        return Db::getInstance()->executeS($sql);
+    }
 }
