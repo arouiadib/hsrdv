@@ -36,6 +36,10 @@ services:
             $router: '@router'
 
 
+    prestashop.module.hsrdv.file_uploader:
+        class: PrestaShop\Module\HsRdv\Service\FileUploader
+        arguments:
+            - "@logger"
 
     ##############################################
     # Type réparation

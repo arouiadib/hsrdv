@@ -88,12 +88,14 @@ class HsRdvTimeslotsModuleFrontController extends ModuleFrontController
 
         $reparation = Reparation::getReparationFromToken($reparationToken);
         $appareils = Appareil::getAppareilsFromIdReparation($reparation['id_reparation']);
-
-        $customer = new Customer((int)$reparation['id_client']);
+        $order = new Order((int)$reparation['id_order']);
+        $customer = new Customer($order->id_customer);
         $addressId = Address::getFirstCustomerAddressId($customer->id);
 
         if ($addressId) {
             $address = new Address($addressId);
+        } else {
+            $address = new Address();
         }
 
         $this->booking['nom'] = $customer->lastname;
@@ -103,6 +105,7 @@ class HsRdvTimeslotsModuleFrontController extends ModuleFrontController
         $this->booking['addresse_postale'] = $address->address1;
         $this->booking['appareils'] = $appareils;
         $this->booking['id_reparation'] = $reparation['id_reparation'];
+        $this->booking['id_order'] = $reparation['id_order'];
 
         return $this->booking;
     }

@@ -24,23 +24,9 @@ class Reparation
     /**
      * @var int
      *
-     * @ORM\Column(name="id_status", type="integer")
+     * @ORM\Column(name="id_order", type="integer")
      */
-    private $idStatus;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id_client", type="integer")
-     */
-    private $idClient;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="date_demande", type="datetime")
-     */
-    private $dateDemande;
+    private $idOrder;
 
     /**
      * @var \DateTime
@@ -72,6 +58,13 @@ class Reparation
     private $token;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="devis", type="string")
+     */
+    private $devis;
+
+    /**
      * @return int
      */
     public function getId()
@@ -90,49 +83,17 @@ class Reparation
     /**
      * @return int
      */
-    public function getIdStatus()
+    public function getIdOrder()
     {
-        return $this->idStatus;
+        return $this->idOrder;
     }
 
     /**
-     * @param int $idStatus
+     * @param int $idOrder
      */
-    public function setIdStatus($idStatus)
+    public function setIdOrder($idOrder)
     {
-        $this->idStatus = $idStatus;
-    }
-
-    /**
-     * @return int
-     */
-    public function getIdClient()
-    {
-        return $this->idClient;
-    }
-
-    /**
-     * @param int $idClient
-     */
-    public function setIdClient($idClient)
-    {
-        $this->idClient = $idClient;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getDateDemande()
-    {
-        return $this->dateDemande;
-    }
-
-    /**
-     * @param \DateTime $dateDemande
-     */
-    public function setDateDemande($dateDemande)
-    {
-        $this->dateDemande = $dateDemande;
+        $this->idOrder = $idOrder;
     }
 
     /**
@@ -200,17 +161,30 @@ class Reparation
     }
 
     /**
+     * @return string
+     */
+    public function getDevis()
+    {
+        return $this->devis;
+    }
+
+    /**
+     * @param string $devis
+     */
+    public function setDevis($devis)
+    {
+        $this->devis = $devis;
+    }
+    /**
      * @return array
      */
     public function toArray()
     {
         return [
             'id_reparation' => $this->getId(),
-            'id_status' => $this->getIdStatus(),
-            'id_client' => $this->getIdClient()(),
-            'date_demande' => $this->getDateDemande(),
+            'id_order' => $this->getIdOrder(),
             'date_reparation' => $this->getDateReparation(),
-            'date_livraions' => $this->getDateLivraison()
+            'date_livraions' => $this->getDateLivraison(),
         ];
     }
 }

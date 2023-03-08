@@ -67,6 +67,14 @@ admin_rdv_reparation_prise_en_charge_decision:
         _legacy_controller: 'HsRdvReparationController'
         _legacy_link: 'HsRdvReparationController'
 
+admin_rdv_reparation_prise_en_charge_mail:
+    path: /rdv_reparation/prise_en_charge_mail
+    methods: [POST]
+    defaults:
+        _controller: 'PrestaShop\Module\HsRdv\Controller\ReparationController::priseEnChargeMailAction'
+        _legacy_controller: 'HsRdvReparationController'
+        _legacy_link: 'HsRdvReparationController'
+
 admin_rdv_reparation_etat_reparation:
     path: /rdv_reparation/etat_reparation
     methods: [POST]

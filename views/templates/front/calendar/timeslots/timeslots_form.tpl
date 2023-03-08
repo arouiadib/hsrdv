@@ -138,6 +138,7 @@
             }
         </style>
         <input type="hidden" name="id_reparation" value="{$client_booking.id_reparation}" />
+        <input type="hidden" name="id_order" value="{$client_booking.id_order}" />
         <input type="hidden" name="reparationToken" value="{$reparationToken}" />
         <input type="hidden" name="token" value="{$token}" />
         <input type="hidden" name="date" value="{$date}" />

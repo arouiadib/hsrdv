@@ -51,6 +51,7 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         $this->booking['email'] =  Tools::getValue('email');
         $this->booking['appareils'] =  $appareils;
         $this->booking['id_reparation'] =  Tools::getValue('id_reparation');
+        $this->booking['id_order'] =  Tools::getValue('id_order');
 
         return $this->booking;
     }
@@ -170,10 +171,13 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         $addresse_postale = trim(Tools::getValue('addresse_postale'));
         $telephone =  trim(Tools::getValue('telephone'));
         $idReparation = (int) Tools::getValue('id_reparation');
+        $idOrder = (int) Tools::getValue('id_order');
         $time = trim(Tools::getValue('time'));
         $date = trim(Tools::getValue('date'));
 
         $reparationBookings = Booking::getBookingsFromIdReparation($idReparation);
+        $order = new Order((int)$idOrder);
+        $states = $this->getOrderStatuses();
 
         if(count($reparationBookings) > 0) {
             foreach ($reparationBookings as $booking) {
@@ -196,7 +200,7 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         $booking->id_reparation = $idReparation;
         $booking->add();
 
-        $appareils = Appareil::getAppareilsFromIdReparation($idReparation);
+        $appareils = Appareil::getAcceptedAppareilsFromIdReparation($idReparation);
         $countAppareils = count($appareils);
 
         if ($countAppareils > 2) {
@@ -211,15 +215,11 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
             $booking->add();
         }
 
-        $reparation = new Reparation($idReparation);
-        $id_client = $reparation->id_client;
-
-        $customer = new Customer($id_client);
+        $customer = new Customer($order->id_customer);
         $customer->firstname = $prenom;
         $customer->lastname = $nom;
-        //var_dump($customer);
         $addressId = Address::getFirstCustomerAddressId($customer->id);
-        //var_dump($addressId);die;
+
         if ($addressId) {
             $address = new Address($addressId);
         }
@@ -244,9 +244,9 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
             $address->add();
         }
 
+        $order->current_state = $states['RDV_PRIS'];
+        $order->update();
         if ($customer->update()) {
-            $reparation->id_status = $this->module :: RDV_PRIS;
-            $reparation->update();
             $appareilsListString = '';
 
             $lastAppareilKey = array_key_last($appareils);
@@ -258,15 +258,13 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
                 }
             }
 
-            //echo $datetime->format('l');
             $langLocale = $this->context->language->locale;
             $explodeLocale = explode('-', $langLocale);
             $localeOfContextLanguage = $explodeLocale[0].'_'.Tools::strtoupper($explodeLocale[1]);
 
             setlocale(LC_ALL, $localeOfContextLanguage.'.UTF-8', $localeOfContextLanguage);
             $dateFormatted = strftime("%d %B %Y", strtotime( $date));
-
-
+            
             $var_list = [
                 '{date}' =>  $dateFormatted,
                 '{liste_appareils}' => $appareilsListString,
@@ -275,7 +273,6 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
                 '{heure}' => $time
 
             ];
-            //todo: Rappeler seulement les appareils acceptés
 
             if($customer->email){
                 $sent= Mail::Send(
@@ -364,5 +361,22 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
         }
 
         return $slots;
+    }
+
+    private function getOrderStatuses() {
+        $finalStatuses = [];
+        $statuses = Hsrdv::STATUSES;
+        $dbStatuses = OrderState::getOrderStates($this->context->language->id);
+
+        foreach ($dbStatuses as $dbStatus) {
+            foreach ($statuses as $key => $status) {
+                if ($status['title'] == $dbStatus['name'] ) {
+                    $finalStatuses[$key] = (int)$dbStatus['id_order_state'];
+                }
+            }
+
+        }
+
+        return $finalStatuses;
     }
 }
