@@ -264,7 +264,7 @@ class HsRdvProcessBookingModuleFrontController extends ModuleFrontController {
 
             setlocale(LC_ALL, $localeOfContextLanguage.'.UTF-8', $localeOfContextLanguage);
             $dateFormatted = strftime("%d %B %Y", strtotime( $date));
-            
+
             $var_list = [
                 '{date}' =>  $dateFormatted,
                 '{liste_appareils}' => $appareilsListString,
