@@ -246,8 +246,8 @@ class HsRdvProcessRdvInitialModuleFrontController extends ModuleFrontController 
         $order->id_shop_group = (int)$this->context->shop->id_shop_group;
         $secure_key =  md5(uniqid(rand(), true));
         $order->secure_key = ($secure_key ? pSQL($secure_key) : pSQL($this->context->customer->secure_key));
-        $order->payment = 'gh';
-        $order->module = 'free_order';
+        $order->payment = 'N/A';
+        $order->module = 'hsrdv';
         $order->total_paid = 0;
         $order->total_paid_real = 0;
         $order->total_products = 0;

@@ -26,7 +26,7 @@ use PrestaShop\Module\HsRdv\Model\Booking;
 class Hsrdv extends Module implements WidgetInterface
 {
     const STATUSES = [
-        'DEMANDE_REPARATION' => [ 'title' => 'Demande de réparation', 'color' => '#faff0b'],
+        'DEMANDE_REPARATION' => [ 'title' => 'Demande de réparation', 'color' => '#74fffa'],
         'PRISE_RDV' => [ 'title' => 'Prise de rendez-vous', 'color' => '#24ff23'],
         'RDV_REFUSE' => [ 'title' => 'Rendez-vous refusé', 'color' => '#ff4727'],
         'RDV_PRIS' => [ 'title' => 'Rendez-vous pris', 'color' => '#26aa00'],
